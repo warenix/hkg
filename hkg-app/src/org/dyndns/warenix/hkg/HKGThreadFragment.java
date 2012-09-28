@@ -29,7 +29,10 @@ public class HKGThreadFragment extends Fragment {
 		}
 	};
 
-	final String mCss = ".ViewQuote { padding: 0px 0px 10px 12px; border-bottom: 2px dashed rgb(208, 208, 208); color: rgb(0, 0, 160);}";
+	final String mCss = ".ViewQuote {border-left: 1px solid;"
+			+ "margin: 0.1em 0;" + "padding: 0.1em 10px;"
+			+ "line-height: 1.45;" + "position: relative;"
+			+ "border-bottom: 2px solid;" + "border-left: 1px solid;" + "}";
 
 	public static HKGThreadFragment newInstance(String threadId, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
