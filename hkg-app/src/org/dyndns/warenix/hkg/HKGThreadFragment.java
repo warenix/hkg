@@ -1,9 +1,11 @@
 package org.dyndns.warenix.hkg;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
+import org.dyndns.warenix.hkg.HKGController.HKGListener;
+import org.dyndns.warenix.hkg.HKGThread.HKGPage;
+import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.hkg.parser.HKGThreadParser;
-import org.dyndns.warenix.hkg.parser.HKGThreadParser.PageRequest;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,18 +16,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-public class HKGThreadFragment extends Fragment {
+public class HKGThreadFragment extends Fragment implements HKGListener {
 	HKGThreadParser parser;
 	WebView mWebView;
 
 	int mPageNo;
 	String mThreadId;
 
+	HKGThread mThread;
+
 	static final String mLoadingHtml = "Loading... Please wait";
 
 	Handler mHKGThreadHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			setWebViewContent(parser.toString());
+			HKGThread thread = (HKGThread) msg.obj;
+			HKGPage page = thread.mPageMap.get(thread.mSelectedPage);
+			setWebViewContent(formatHKGPageToHTML(page));
 		}
 	};
 
@@ -38,6 +44,7 @@ public class HKGThreadFragment extends Fragment {
 		HKGThreadFragment f = new HKGThreadFragment();
 		f.mPageNo = pageNo;
 		f.mThreadId = threadId;
+		f.mThread = new HKGThread(threadId, null, 0, null, 0, 0);
 		return f;
 	}
 
@@ -57,14 +64,17 @@ public class HKGThreadFragment extends Fragment {
 
 		new Thread() {
 			public void run() {
-				parser = new HKGThreadParser();
-				try {
-					parser.parse(PageRequest.getReadThreadUrl(mThreadId,
-							mPageNo));
-					mHKGThreadHandler.sendEmptyMessage(0);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				HKGController controller = HKGController.getController();
+				controller.setHKGListener(HKGThreadFragment.this);
+				controller.readThreadByPage(mThread, mPageNo);
+				// parser = new HKGThreadParser();
+				// try {
+				// parser.parse(PageRequest.getReadThreadUrl(mThreadId,
+				// mPageNo));
+				// mHKGThreadHandler.sendEmptyMessage(0);
+				// } catch (IOException e) {
+				// e.printStackTrace();
+				// }
 			}
 		}.start();
 	}
@@ -80,6 +90,35 @@ public class HKGThreadFragment extends Fragment {
 		s.append(content);
 		s.append("</html>");
 		mWebView.loadData(s.toString(), mimeType, encoding);
+	}
+
+	@Override
+	public void onTopicLoaded(String type, int pageNo,
+			ArrayList<HKGThread> threadList) {
+
+	}
+
+	@Override
+	public void onThreadLoaded(HKGThread thread) {
+		Message msg = new Message();
+		msg.obj = thread;
+		mHKGThreadHandler.sendMessage(msg);
+	}
+
+	String formatHKGPageToHTML(HKGPage page) {
+
+		StringBuffer s = new StringBuffer(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+		s.append("\nTitle:" + mThread.mTitle);
+		s.append("\nPages Count:" + mThread.mSelectedPage + "/"
+				+ mThread.mPageCount);
+		s.append("\nReplies Count:" + page.getReplyList().size());
+		int count = 0;
+		for (HKGReply reply : page.getReplyList()) {
+			s.append("\n<hr/>#" + count++);
+			s.append(reply.toString());
+		}
+		return s.toString();
 	}
 
 }

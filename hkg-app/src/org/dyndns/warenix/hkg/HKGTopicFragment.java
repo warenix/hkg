@@ -1,12 +1,10 @@
 package org.dyndns.warenix.hkg;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
+import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.parser.HKGListParser;
 import org.dyndns.warenix.hkg.parser.HKGListParser.HKGList;
-import org.dyndns.warenix.hkg.parser.HKGListParser.Topic;
-import org.dyndns.warenix.hkg.parser.HKGThreadParser.PageRequest;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -23,23 +21,27 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TwoLineListItem;
 
-public class HKGTopicFragment extends ListFragment {
+public class HKGTopicFragment extends ListFragment implements HKGListener {
 	HKGListParser parser;
 	WebView mWebView;
 
 	int mPageNo;
 	String mType;
 
-	TopicListener mListener;
-	ArrayAdapter<Topic> adapter;
+	HKGThreadListener mListener;
+	ArrayAdapter<HKGThread> adapter;
 	Handler mHKGThreadHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			HKGList hkgList = parser.getHKGList();
-			final ArrayList<Topic> topicList = hkgList.getTopicList();
+
+			final ArrayList<HKGThread> threadList = (ArrayList<HKGThread>) msg.obj;
+
+			// HKGList hkgList = parser.getHKGList();
+			// final ArrayList<HKGThread> topicList =
+			// hkgList.getHKGThreadList();
 
 			if (getActivity() != null) {
-				adapter = new ArrayAdapter<Topic>(getActivity(),
-						android.R.layout.simple_list_item_2, topicList) {
+				adapter = new ArrayAdapter<HKGThread>(getActivity(),
+						android.R.layout.simple_list_item_2, threadList) {
 					@Override
 					public View getView(int position, View convertView,
 							ViewGroup parent) {
@@ -53,12 +55,12 @@ public class HKGTopicFragment extends ListFragment {
 						} else {
 							row = (TwoLineListItem) convertView;
 						}
-						Topic topic = topicList.get(position);
+						HKGThread topic = threadList.get(position);
 						row.getText1().setText(
 								String.format("%s -- %d  \u2764 %d",
-										Html.fromHtml(topic.title),
-										topic.repliesCount, topic.rating));
-						row.getText2().setText(topic.user);
+										Html.fromHtml(topic.mTitle),
+										topic.mRepliesCount, topic.mRating));
+						row.getText2().setText(topic.mUser);
 
 						return row;
 					}
@@ -80,13 +82,16 @@ public class HKGTopicFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		new Thread() {
 			public void run() {
-				parser = new HKGListParser();
-				try {
-					parser.parse(PageRequest.getListUrl(mType, mPageNo));
-					mHKGThreadHandler.sendEmptyMessage(0);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				HKGController controller = HKGController.getController();
+				controller.setHKGListener(HKGTopicFragment.this);
+				controller.readTopicByPage(mType, mPageNo);
+				// parser = new HKGListParser();
+				// try {
+				// parser.parse(PageRequest.getListUrl(mType, mPageNo));
+				// mHKGThreadHandler.sendEmptyMessage(0);
+				// } catch (IOException e) {
+				// e.printStackTrace();
+				// }
 			}
 		}.start();
 
@@ -96,15 +101,35 @@ public class HKGTopicFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Log.i("FragmentList", "Item clicked: " + id);
 		if (mListener != null) {
-			mListener.onTopicSelected((Topic) adapter.getItem(position));
+			mListener
+					.onHKGThreadSelected((HKGThread) adapter.getItem(position));
 		}
 	}
 
-	public void setTopicListener(TopicListener listener) {
+	public void setHKGThreadListener(HKGThreadListener listener) {
 		mListener = listener;
 	}
 
-	interface TopicListener {
-		public void onTopicSelected(Topic topic);
+	/**
+	 * UI listener
+	 * 
+	 * @author warenx
+	 * 
+	 */
+	interface HKGThreadListener {
+		public void onHKGThreadSelected(HKGThread topic);
+	}
+
+	@Override
+	public void onTopicLoaded(String type, int pageNo,
+			ArrayList<HKGThread> threadList) {
+		Message msg = new Message();
+		msg.obj = threadList;
+		mHKGThreadHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onThreadLoaded(HKGThread thread) {
+
 	}
 }

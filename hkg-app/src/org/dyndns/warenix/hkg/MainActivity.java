@@ -1,7 +1,6 @@
 package org.dyndns.warenix.hkg;
 
-import org.dyndns.warenix.hkg.HKGTopicFragment.TopicListener;
-import org.dyndns.warenix.hkg.parser.HKGListParser.Topic;
+import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,7 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends FragmentActivity implements TopicListener {
+public class MainActivity extends FragmentActivity implements HKGThreadListener {
 
 	int mCurrentTopicPage = 1;
 	int mCurrentThreadPage = 1;
@@ -35,10 +34,19 @@ public class MainActivity extends FragmentActivity implements TopicListener {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_refresh:
-			mCurrentTopicPage = 1;
-			mCurrentThreadPage = 1;
+			// go to first page
+			if (isThreadMode) {
+				if (mCurrentThreadPage > 1) {
+					mCurrentThreadPage = 1;
+					showThread(mCurrentTopicThreadId, mCurrentThreadPage);
+				}
+			} else {
+				mCurrentTopicPage = 1;
+				mCurrentThreadPage = 1;
 
-			showTopic("BW", 1);
+				showTopic("BW", 1);
+			}
+
 			break;
 		case R.id.menu_more:
 			if (isThreadMode) {
@@ -55,7 +63,7 @@ public class MainActivity extends FragmentActivity implements TopicListener {
 		updateTitle(getString(R.string.title_activity_main), pageNo);
 
 		HKGTopicFragment f = HKGTopicFragment.newInstance(type, pageNo);
-		f.setTopicListener(this);
+		f.setHKGThreadListener(this);
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
 		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
@@ -74,18 +82,18 @@ public class MainActivity extends FragmentActivity implements TopicListener {
 		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
 				R.anim.slide_in_left, R.anim.slide_out_right);
 
-		ft.add(R.id.container, HKGThreadFragment.newInstance(threadId, pageNo))
-				.addToBackStack(null);
+		ft.add(R.id.container, HKGThreadFragment.newInstance(threadId, pageNo));
+		ft.addToBackStack(null);
 		ft.commit();
 
 	}
 
 	@Override
-	public void onTopicSelected(Topic topic) {
+	public void onHKGThreadSelected(HKGThread topic) {
 		isThreadMode = true;
-		mCurrentTopicTitle = topic.title;
-		mCurrentTopicThreadId = topic.threadId;
-		showThread(topic.threadId, 1);
+		mCurrentTopicTitle = topic.mTitle;
+		mCurrentTopicThreadId = topic.mThreadId;
+		showThread(topic.mThreadId, 1);
 	}
 
 	public void onBackPressed() {

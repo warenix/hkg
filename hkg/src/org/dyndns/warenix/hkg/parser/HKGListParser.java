@@ -2,11 +2,18 @@ package org.dyndns.warenix.hkg.parser;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.dyndns.warenix.hkg.HKGThread;
+
+/**
+ * Parse a list of HKGThreads (without replies) for a page.
+ * 
+ * @author warenix
+ * 
+ */
 public class HKGListParser extends HKGParser {
 
-	enum Step {
+	private enum Step {
 		FIND_TOPIC, //
 		FIND_TOPIC_ID, //
 		FIND_TOPIC_REPLIES_COUNT, //
@@ -17,18 +24,13 @@ public class HKGListParser extends HKGParser {
 
 	private Step mCurrentStep = Step.FIND_TOPIC_ID;
 
-	int pageCount = 0;
+	private int pageCount = 0;
 
-	final Pattern mUserPattern = Pattern.compile("(.*?)\\(評分: ([0-9]+)");
-	final static Pattern mHrefPattern = Pattern
-			.compile("<a[^>]+href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
-	final Pattern mThreadIdPattern = Pattern.compile("message=([0-9]+)");
-	Topic topic;
-	HKGList hkgList = new HKGList();
-	StringBuffer content = new StringBuffer();
+	private HKGThread mThread;
+	private HKGList mHKGList = new HKGList();
 
 	@Override
-	public void feed(String inputLine) {
+	public boolean feed(String inputLine) {
 		if (inputLine.replace(" ", "").length() > 0) {
 			// System.out.println(inputLine);
 			switch (mCurrentStep) {
@@ -40,11 +42,10 @@ public class HKGListParser extends HKGParser {
 			case FIND_TOPIC_ID:
 				Matcher matcher = mHrefPattern.matcher(inputLine);
 				if (matcher.find()) {
-					topic = new Topic();
-					// topic.threadId = matcher.group(1);
+					mThread = new HKGThread();
 					Matcher m = mThreadIdPattern.matcher(matcher.group(1));
 					if (m.find()) {
-						topic.threadId = m.group(1);
+						mThread.mThreadId = m.group(1);
 					}
 				}
 
@@ -54,24 +55,24 @@ public class HKGListParser extends HKGParser {
 				}
 				break;
 			case FIND_TOPIC_REPLIES_COUNT:
-				topic.repliesCount = Integer.parseInt(inputLine
-						.replace(" ", ""));
+				mThread.mRepliesCount = Integer.parseInt(inputLine.replace(" ",
+						""));
 				mCurrentStep = Step.FIND_TOPIC_TITLE;
 				break;
 			case FIND_TOPIC_TITLE:
 				if (!("         <div>".equals(inputLine) || "         </div>"
 						.equals(inputLine))) {
-					topic.title = inputLine.replace(" ", "").replace(
+					mThread.mTitle = inputLine.replace(" ", "").replace(
 							"&nbsp;&nbsp;-&nbsp;", "");
 					mCurrentStep = Step.FIND_TOPIC_USER;
 				}
 				break;
 			case FIND_TOPIC_USER:
-				Matcher m = mUserPattern.matcher(inputLine);
+				Matcher m = mThreadUserPattern.matcher(inputLine);
 				if (m.find()) {
-					topic.user = m.group(1).replace(" ", "")
+					mThread.mUser = m.group(1).replace(" ", "")
 							.replace("&nbsp;&nbsp;-&nbsp;", "");
-					topic.rating = Integer.parseInt(m.group(2));
+					mThread.mRating = Integer.parseInt(m.group(2));
 					mCurrentStep = Step.FIND_TOPIC_PAGE_COUNT;
 				}
 
@@ -79,8 +80,8 @@ public class HKGListParser extends HKGParser {
 			case FIND_TOPIC_PAGE_COUNT:
 				pageCount++;
 				if ("</select>".equals(inputLine)) {
-					topic.pageCount = pageCount - 2;
-					hkgList.addTopic(topic);
+					mThread.mPageCount = pageCount - 2;
+					mHKGList.addHKGThread(mThread);
 
 					pageCount = 0;
 					mCurrentStep = Step.FIND_TOPIC;
@@ -88,45 +89,46 @@ public class HKGListParser extends HKGParser {
 				break;
 			}
 		}
+		return true;
 	}
 
 	public HKGList getHKGList() {
-		return hkgList;
+		return mHKGList;
 	}
 
 	public String toString() {
 		StringBuffer s = new StringBuffer();
-		for (Topic topic : hkgList.mTopicList) {
+		for (HKGThread thread : mHKGList.mHKGThreadList) {
 			s.append("\n<hr/>");
-			s.append("\nthreadId:" + topic.threadId);
-			s.append("\ntitle:" + topic.title);
-			s.append("\nuser:" + topic.user);
-			s.append("\npage count:" + topic.pageCount);
-			s.append("\nrating:" + topic.rating);
+			s.append("\nthreadId:" + thread.mThreadId);
+			s.append("\ntitle:" + thread.mTitle);
+			s.append("\nuser:" + thread.mUser);
+			s.append("\npage count:" + thread.mPageCount);
+			s.append("\nrating:" + thread.mRating);
 		}
 
 		return s.toString();
 	}
 
 	public static class HKGList {
-		ArrayList<Topic> mTopicList = new ArrayList<Topic>();
+		ArrayList<HKGThread> mHKGThreadList = new ArrayList<HKGThread>();
 
-		public void addTopic(Topic topic) {
-			mTopicList.add(topic);
+		public void addHKGThread(HKGThread thread) {
+			mHKGThreadList.add(thread);
 		}
 
-		public ArrayList<Topic> getTopicList() {
-			return mTopicList;
+		public ArrayList<HKGThread> getHKGThreadList() {
+			return mHKGThreadList;
 		}
 	}
 
-	public static class Topic {
-		public String threadId;
-		public String user;
-		public int repliesCount;
-		public String title;
-		public int rating;
-		public int pageCount;
+	/**
+	 * Get parser result.
+	 * 
+	 * @return A list of threads of the requested page.
+	 */
+	public ArrayList<HKGThread> getHKGThreadList() {
+		return mHKGList.getHKGThreadList();
 	}
 
 }

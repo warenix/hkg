@@ -1,6 +1,9 @@
 package org.dyndns.warenix.hkg.parser;
 
-import org.dyndns.warenix.hkg.parser.HKGThreadParser.PageRequest;
+import java.util.ArrayList;
+
+import org.dyndns.warenix.hkg.HKGThread;
+import org.dyndns.warenix.hkg.parser.HKGParser.PageRequest;
 
 public class TestHKGListParser {
 	public static void main(String args[]) {
@@ -16,7 +19,12 @@ public class TestHKGListParser {
 			String type = "BW";
 			int pageNo = 2;
 			parser.parse(PageRequest.getListUrl(type, pageNo));
-			System.out.println(parser);
+			// System.out.println(parser);
+			ArrayList<HKGThread> threadList = parser.getHKGThreadList();
+
+			for (HKGThread thread : threadList) {
+				System.out.println(thread.mUser);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
