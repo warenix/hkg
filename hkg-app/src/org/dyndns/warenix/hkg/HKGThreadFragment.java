@@ -54,6 +54,7 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 		View view = inflater.inflate(R.layout.activity_webview, container,
 				false);
 		mWebView = (WebView) view.findViewById(R.id.webView1);
+		mWebView.getSettings().setDefaultTextEncodingName("utf-8");
 		mWebView.getSettings().setBuiltInZoomControls(true);
 		setWebViewContent(mLoadingHtml);
 		return view;
@@ -81,7 +82,7 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 
 	void setWebViewContent(String content) {
 		String mimeType = "text/html; charset=utf-8";
-		String encoding = null;
+		String encoding = "utf-8";
 
 		StringBuffer s = new StringBuffer();
 		s.append("<html><style type=\"text/css\">");
