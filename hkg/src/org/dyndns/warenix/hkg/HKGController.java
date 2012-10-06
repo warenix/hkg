@@ -40,7 +40,7 @@ public class HKGController {
 				&& cachedPage.getReplyList().size() == HKGPage.MAX_REPLIES_PER_PAGE;
 		boolean mayHaveNewReply = mayHaveNewReplyInThisPage
 				|| mayHaveNewReplyInNewLastPage;
-		if (hasNoCache || mayHaveNewReply) {
+//		if (hasNoCache || mayHaveNewReply) {
 			try {
 				HKGThreadParser parser = new HKGThreadParser();
 				parser.setHKGThread(thread);
@@ -49,7 +49,7 @@ public class HKGController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 		if (mListener != null) {
 			mListener.onThreadLoaded(thread);
 		}

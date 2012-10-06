@@ -6,7 +6,6 @@ import org.dyndns.warenix.hkg.HKGController;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
-import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 
 public class TestHKGTController {
 	public static void main(String args[]) {
@@ -14,9 +13,10 @@ public class TestHKGTController {
 		HKGController controller = HKGController.getController();
 		controller.setHKGListener(listener);
 		// controller.readTopicByPage("BW", 1);
-		HKGThread thread = new HKGThread("3987703", null, 0, null, 0, 0);
+		HKGThread thread = new HKGThread("3997451", null, -1, null, -1, -1);
+		printThread(thread);
 		controller.readThreadByPage(thread, 1);
-		controller.readThreadByPage(thread, 1);
+		controller.readThreadByPage(thread, 2);
 
 	}
 
@@ -35,11 +35,16 @@ public class TestHKGTController {
 		@Override
 		public void onThreadLoaded(HKGThread thread) {
 			System.out.println("Thread loaded");
-			HKGPage page = thread.mPageMap.get(thread.mSelectedPage);
-			for (HKGReply reply : page.getReplyList()) {
-				System.out.println(reply);
-			}
+			printThread(thread);
+			// HKGPage page = thread.mPageMap.get(thread.mSelectedPage);
+			// for (HKGReply reply : page.getReplyList()) {
+			// System.out.println(reply);
+			// }
 		}
+	}
 
+	static void printThread(HKGThread thread) {
+		System.out.println(String.format("selected:%d pageCount:%d",
+				thread.mSelectedPage, thread.mPageCount));
 	}
 }

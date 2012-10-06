@@ -17,7 +17,7 @@ public class HKGThread {
 	/*
 	 * obtained only if a thread is opened
 	 */
-	public int mSelectedPage;
+	public int mSelectedPage = -1;
 
 	public HashMap<Integer, HKGPage> mPageMap = new HashMap<Integer, HKGThread.HKGPage>();
 

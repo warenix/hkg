@@ -38,12 +38,9 @@ public class MainActivity extends ABSActionbarActivity implements
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		Log.d(TAG, "onNavigationItemSelceted(), switch page itemPosition "
+	public boolean onNavigationItemChanged(int itemPosition, long itemId) {
+		Log.d(TAG, "onNavigationItemChanged(), switch page itemPosition "
 				+ itemPosition);
-		if (itemPosition == 0) {
-			return true;
-		}
 
 		int newPageCount = itemPosition + 1;
 		Toast.makeText(getApplicationContext(), "new page" + newPageCount,
@@ -70,12 +67,7 @@ public class MainActivity extends ABSActionbarActivity implements
 
 	void setPageSwitcher(HKGThread thread) {
 		Log.d(TAG, "setPageSwitcher(), update navigation list item");
-
-		Context context = getSupportActionBar().getThemedContext();
-		mAdapter = new SwitchPageAdapter(context, R.layout.switch_page_dropdown);
-		mAdapter.setPageCount(thread.mPageCount);
-		mAdapter.setTitle(thread.mTitle);
-		setActionBarList(mAdapter);
+		setSwitchThreadPageAdapter(thread.mTitle, thread.mPageCount);
 	}
 
 	@Override
@@ -84,7 +76,9 @@ public class MainActivity extends ABSActionbarActivity implements
 
 		HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.container, f);
+		ft.setCustomAnimations(0, R.anim.slide_out_right, 0,
+				R.anim.slide_out_right);
+		ft.add(R.id.container, f);
 		ft.addToBackStack(null);
 		ft.commit();
 
@@ -128,7 +122,7 @@ public class MainActivity extends ABSActionbarActivity implements
 		if (mThread != null) {
 			mThread = null;
 			mCurrentTopicPage = 1;
-			setActionBarList(null);
+			setActionBarList(null, -1);
 		}
 	}
 }

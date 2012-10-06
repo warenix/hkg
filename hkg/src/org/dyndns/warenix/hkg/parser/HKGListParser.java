@@ -24,7 +24,7 @@ public class HKGListParser extends HKGParser {
 
 	private Step mCurrentStep = Step.FIND_TOPIC_ID;
 
-	private int pageCount = 0;
+	private int pageCount = -1;
 
 	private HKGThread mThread;
 	private HKGList mHKGList = new HKGList();
