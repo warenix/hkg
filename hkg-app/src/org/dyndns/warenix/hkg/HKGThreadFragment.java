@@ -2,34 +2,46 @@ package org.dyndns.warenix.hkg;
 
 import java.util.ArrayList;
 
+import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
-import org.dyndns.warenix.hkg.parser.HKGThreadParser;
+import org.dyndns.warenix.lab.hkg.R;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-public class HKGThreadFragment extends Fragment implements HKGListener {
-	HKGThreadParser parser;
+import com.actionbarsherlock.app.SherlockFragment;
+
+public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	WebView mWebView;
 
-	int mPageNo;
-	String mThreadId;
+	static final String TAG = "Main";
 
-	HKGThread mThread;
+	SwitchPageAdapter mAdapter;
+
+	HKGController mController;
 
 	static final String mLoadingHtml = "Loading... Please wait";
 
-	Handler mHKGThreadHandler = new Handler() {
+	/**
+	 * Currently displayed thread
+	 */
+	HKGThread mThread;
+
+	Handler mUIHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			HKGThread thread = (HKGThread) msg.obj;
+
+			MainActivity activity = (MainActivity) getActivity();
+			activity.setPageSwitcher(thread);
+
 			HKGPage page = thread.mPageMap.get(thread.mSelectedPage);
 			setWebViewContent(formatHKGPageToHTML(page));
 		}
@@ -42,9 +54,13 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 
 	public static HKGThreadFragment newInstance(String threadId, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
-		f.mPageNo = pageNo;
-		f.mThreadId = threadId;
-		f.mThread = new HKGThread(threadId, null, 0, null, 0, 0);
+		f.mThread = new HKGThread(threadId, null, -1, null, -1, -1);
+		return f;
+	}
+
+	public static HKGThreadFragment newInstance(HKGThread thread, int pageNo) {
+		HKGThreadFragment f = new HKGThreadFragment();
+		f.mThread = thread;
 		return f;
 	}
 
@@ -63,21 +79,10 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		new Thread() {
-			public void run() {
-				HKGController controller = HKGController.getController();
-				controller.setHKGListener(HKGThreadFragment.this);
-				controller.readThreadByPage(mThread, mPageNo);
-				// parser = new HKGThreadParser();
-				// try {
-				// parser.parse(PageRequest.getReadThreadUrl(mThreadId,
-				// mPageNo));
-				// mHKGThreadHandler.sendEmptyMessage(0);
-				// } catch (IOException e) {
-				// e.printStackTrace();
-				// }
-			}
-		}.start();
+		mController = new HKGController();
+		mController.setHKGListener(this);
+
+		switchPage(mThread.mThreadId, 1);
 	}
 
 	void setWebViewContent(String content) {
@@ -101,9 +106,10 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 
 	@Override
 	public void onThreadLoaded(HKGThread thread) {
+		Log.d(TAG, "onThreadLoaded(), update UI");
 		Message msg = new Message();
 		msg.obj = thread;
-		mHKGThreadHandler.sendMessage(msg);
+		mUIHandler.sendMessage(msg);
 	}
 
 	String formatHKGPageToHTML(HKGPage page) {
@@ -120,6 +126,18 @@ public class HKGThreadFragment extends Fragment implements HKGListener {
 			s.append(reply.toString());
 		}
 		return s.toString();
+	}
+
+	void switchPage(final String threadId, final int pageNo) {
+
+		new Thread() {
+			public void run() {
+				Log.d(TAG, "switchPage(), reading thread by page");
+
+				// mThread = new HKGThread(threadId, null, -1, null, -1, -1);
+				mController.readThreadByPage(mThread, pageNo);
+			}
+		}.start();
 	}
 
 }

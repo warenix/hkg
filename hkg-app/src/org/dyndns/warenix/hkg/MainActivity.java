@@ -1,67 +1,61 @@
 package org.dyndns.warenix.hkg;
 
+import org.dyndns.warenix.abs.activity.ABSActionbarActivity;
+import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
+import org.dyndns.warenix.lab.hkg.R;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity implements HKGThreadListener {
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+
+public class MainActivity extends ABSActionbarActivity implements
+		HKGThreadListener {
+
+	static final String TAG = "Main";
+
+	SwitchPageAdapter mAdapter;
+
+	/**
+	 * Currently displayed thread
+	 */
+	HKGThread mThread;
 
 	int mCurrentTopicPage = 1;
-	int mCurrentThreadPage = 1;
-	String mCurrentTopicThreadId;
-	String mCurrentTopicTitle;
-	boolean isThreadMode = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		showTopic("BW", 1);
+		showTopic("BW", mCurrentTopicPage);
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_main, menu);
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		Log.d(TAG, "onNavigationItemSelceted(), switch page itemPosition "
+				+ itemPosition);
+		if (itemPosition == 0) {
+			return true;
+		}
+
+		int newPageCount = itemPosition + 1;
+		Toast.makeText(getApplicationContext(), "new page" + newPageCount,
+				Toast.LENGTH_SHORT).show();
+
+		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.container);
+		f.switchPage(mThread.mThreadId, itemPosition + 1);
 		return true;
 	}
 
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_refresh:
-			// go to first page
-			if (isThreadMode) {
-				if (mCurrentThreadPage > 1) {
-					mCurrentThreadPage = 1;
-					showThread(mCurrentTopicThreadId, mCurrentThreadPage);
-				}
-			} else {
-				mCurrentTopicPage = 1;
-				mCurrentThreadPage = 1;
-
-				showTopic("BW", 1);
-			}
-
-			break;
-		case R.id.menu_more:
-			if (isThreadMode) {
-				showThread(mCurrentTopicThreadId, ++mCurrentThreadPage);
-			} else {
-				showTopic("BW", ++mCurrentThreadPage);
-			}
-			break;
-		}
-		return super.onMenuItemSelected(featureId, item);
-	}
-
 	void showTopic(String type, int pageNo) {
-		updateTitle(getString(R.string.title_activity_main), pageNo);
-
 		HKGTopicFragment f = HKGTopicFragment.newInstance(type, pageNo);
 		f.setHKGThreadListener(this);
 		FragmentTransaction ft = this.getSupportFragmentManager()
@@ -74,53 +68,67 @@ public class MainActivity extends FragmentActivity implements HKGThreadListener 
 
 	}
 
-	void showThread(String threadId, int pageNo) {
-		updateTitle(mCurrentTopicTitle, pageNo);
+	void setPageSwitcher(HKGThread thread) {
+		Log.d(TAG, "setPageSwitcher(), update navigation list item");
 
-		FragmentTransaction ft = this.getSupportFragmentManager()
-				.beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
+		Context context = getSupportActionBar().getThemedContext();
+		mAdapter = new SwitchPageAdapter(context, R.layout.switch_page_dropdown);
+		mAdapter.setPageCount(thread.mPageCount);
+		mAdapter.setTitle(thread.mTitle);
+		setActionBarList(mAdapter);
+	}
 
-		ft.add(R.id.container, HKGThreadFragment.newInstance(threadId, pageNo));
+	@Override
+	public void onHKGThreadSelected(HKGThread thread) {
+		mThread = thread;
+
+		HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.container, f);
 		ft.addToBackStack(null);
 		ft.commit();
 
 	}
 
 	@Override
-	public void onHKGThreadSelected(HKGThread topic) {
-		isThreadMode = true;
-		mCurrentTopicTitle = topic.mTitle;
-		mCurrentTopicThreadId = topic.mThreadId;
-		showThread(topic.mThreadId, 1);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuItem refresh = menu.add("Refresh");
+		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				if (mThread == null) {
+					showTopic("BW", 1);
+				}
+				return true;
+			}
+		});
+
+		MenuItem more = menu.add("More");
+		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				if (mThread == null) {
+					showTopic("BW", ++mCurrentTopicPage);
+				}
+				return true;
+			}
+		});
+		return true;
 	}
 
 	public void onBackPressed() {
 		super.onBackPressed();
-		if (isThreadMode) {
-			mCurrentThreadPage -= 1;
 
-			if (mCurrentThreadPage == 0) {
-				// back to topic list
-				mCurrentThreadPage = 1;
-				isThreadMode = false;
-				updateTitle(getString(R.string.title_activity_main),
-						mCurrentThreadPage);
-			} else {
-				updateTitle(mCurrentTopicTitle, mCurrentThreadPage);
-			}
-		} else {
-			if (mCurrentTopicPage > 1) {
-				mCurrentTopicPage -= 1;
-			}
-			updateTitle(getString(R.string.title_activity_main),
-					mCurrentTopicPage);
+		if (mThread != null) {
+			mThread = null;
+			mCurrentTopicPage = 1;
+			setActionBarList(null);
 		}
-
-	}
-
-	private void updateTitle(String title, int pageNo) {
-		setTitle(String.format("%d>%s", pageNo, title));
 	}
 }

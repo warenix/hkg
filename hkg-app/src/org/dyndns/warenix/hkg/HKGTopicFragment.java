@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.parser.HKGListParser;
 import org.dyndns.warenix.hkg.parser.HKGListParser.HKGList;
+import org.dyndns.warenix.lab.hkg.R;
 
 import android.content.Context;
 import android.os.Bundle;
