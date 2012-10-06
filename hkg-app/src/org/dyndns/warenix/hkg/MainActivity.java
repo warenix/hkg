@@ -76,8 +76,8 @@ public class MainActivity extends ABSActionbarActivity implements
 
 		HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.setCustomAnimations(0, R.anim.slide_out_right, 0,
-				R.anim.slide_out_right);
+		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+				R.anim.slide_in_left, R.anim.slide_out_right);
 		ft.add(R.id.container, f);
 		ft.addToBackStack(null);
 		ft.commit();

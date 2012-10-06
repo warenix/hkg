@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	WebView mWebView;
@@ -60,8 +63,13 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	public static HKGThreadFragment newInstance(HKGThread thread, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
+
 		f.mThread = thread;
 		return f;
+	}
+
+	private HKGThreadFragment() {
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -138,6 +146,14 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				mController.readThreadByPage(mThread, pageNo);
 			}
 		}.start();
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		MenuItem refresh = menu.add("Save");
+		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 	}
 
 }

@@ -78,6 +78,10 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 		return f;
 	}
 
+	private HKGTopicFragment() {
+		setHasOptionsMenu(true);
+	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
