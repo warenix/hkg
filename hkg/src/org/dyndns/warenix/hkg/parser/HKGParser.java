@@ -63,7 +63,7 @@ public abstract class HKGParser {
 	public static final Pattern mTitlePattern = Pattern
 			.compile("<title>(.*?)</title>");
 	public static final Pattern mThreadUserPattern = Pattern
-			.compile("(.*?)\\(評分: ([0-9]+)");
+			.compile("(.*?)\\(評分: (-?[0-9]+)");
 	public static final Pattern mHrefPattern = Pattern
 			.compile("<a[^>]+href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
 	public static final Pattern mThreadIdPattern = Pattern
