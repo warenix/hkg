@@ -1,5 +1,6 @@
 package org.dyndns.warenix.hkg;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;

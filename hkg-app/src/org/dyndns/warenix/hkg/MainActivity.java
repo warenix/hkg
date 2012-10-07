@@ -72,6 +72,7 @@ public class MainActivity extends ABSActionbarActivity implements
 
 	@Override
 	public void onHKGThreadSelected(HKGThread thread) {
+		Log.d(TAG, String.format("showing thread %s", thread.mThreadId));
 		mThread = thread;
 
 		HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);

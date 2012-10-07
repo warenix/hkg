@@ -8,6 +8,8 @@ import org.dyndns.warenix.hkg.parser.HKGListParser.HKGList;
 import org.dyndns.warenix.lab.hkg.R;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -58,10 +60,17 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 						}
 						HKGThread topic = threadList.get(position);
 						row.getText1().setText(
-								String.format("%s -- %d  \u2764 %d",
+								String.format("%s -- %d",
 										Html.fromHtml(topic.mTitle),
-										topic.mRepliesCount, topic.mRating));
-						row.getText2().setText(topic.mUser);
+										topic.mRepliesCount));
+						if (topic.mRating < 0) {
+							row.getText1().setTextColor(Color.GRAY);
+						} else {
+							row.getText1().setTextColor(Color.BLACK);
+						}
+						row.getText2().setText(
+								String.format("%s \u2764 %d", topic.mUser,
+										topic.mRating));
 
 						return row;
 					}
