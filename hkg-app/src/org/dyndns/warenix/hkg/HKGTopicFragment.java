@@ -69,8 +69,8 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 							row.getText1().setTextColor(Color.BLACK);
 						}
 						row.getText2().setText(
-								String.format("%s \u2764 %d", topic.mUser,
-										topic.mRating));
+								String.format("%s \u2764 %d\t\t[%s]", topic.mUser,
+										topic.mRating, topic.mThreadId));
 
 						return row;
 					}

@@ -1,6 +1,5 @@
 package org.dyndns.warenix.hkg;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
@@ -21,7 +20,6 @@ import android.webkit.WebView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
 public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	WebView mWebView;
@@ -78,10 +76,12 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.activity_webview, container,
 				false);
-		mWebView = (WebView) view.findViewById(R.id.webView1);
-		mWebView.getSettings().setDefaultTextEncodingName("utf-8");
-		mWebView.getSettings().setBuiltInZoomControls(true);
-		setWebViewContent(mLoadingHtml);
+		if (this.isAdded()) {
+			mWebView = (WebView) view.findViewById(R.id.webView1);
+			mWebView.getSettings().setDefaultTextEncodingName("utf-8");
+			mWebView.getSettings().setBuiltInZoomControls(true);
+			setWebViewContent(mLoadingHtml);
+		}
 		return view;
 	}
 
@@ -152,9 +152,9 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
-		MenuItem refresh = menu.add("Save");
-		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		// MenuItem refresh = menu.add("Save");
+		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+		// | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 	}
 
 }

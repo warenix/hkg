@@ -5,8 +5,8 @@ import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
 import org.dyndns.warenix.lab.hkg.R;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.Toast;
@@ -46,9 +46,12 @@ public class MainActivity extends ABSActionbarActivity implements
 		Toast.makeText(getApplicationContext(), "new page" + newPageCount,
 				Toast.LENGTH_SHORT).show();
 
-		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
-				.findFragmentById(R.id.container);
-		f.switchPage(mThread.mThreadId, itemPosition + 1);
+		Fragment f = getSupportFragmentManager().findFragmentById(
+				R.id.container);
+		if (f instanceof HKGThreadFragment) {
+			((HKGThreadFragment) f).switchPage(mThread.mThreadId,
+					itemPosition + 1);
+		}
 		return true;
 	}
 
