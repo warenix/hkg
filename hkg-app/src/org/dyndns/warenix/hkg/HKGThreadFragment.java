@@ -24,13 +24,14 @@ import com.actionbarsherlock.view.MenuInflater;
 public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	WebView mWebView;
 
-	static final String TAG = "Main";
+	static final String TAG = "HKGThreadFragment";
 
 	SwitchPageAdapter mAdapter;
 
 	HKGController mController;
 
 	static final String mLoadingHtml = "Loading... Please wait";
+	static final String mEmptyHtml = "Cannot open thread.";
 
 	/**
 	 * Currently displayed thread
@@ -39,13 +40,15 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	Handler mUIHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			HKGThread thread = (HKGThread) msg.obj;
+			mThread = (HKGThread) msg.obj;
 
-			MainActivity activity = (MainActivity) getActivity();
-			activity.setPageSwitcher(thread);
-
-			HKGPage page = thread.mPageMap.get(thread.mSelectedPage);
-			setWebViewContent(formatHKGPageToHTML(page));
+			// HKGPage page = mThread.mPageMap.get(mThread.mSelectedPage);
+			HKGPage page = mThread.getPage(mThread.mSelectedPage);
+			if (page == null) {
+				setWebViewContent(mEmptyHtml);
+			} else {
+				setWebViewContent(formatHKGPageToHTML(page));
+			}
 		}
 	};
 
@@ -67,7 +70,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		return f;
 	}
 
-	private HKGThreadFragment() {
+	public HKGThreadFragment() {
 		setHasOptionsMenu(true);
 	}
 
@@ -87,14 +90,9 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		mController = new HKGController();
-		mController.setHKGListener(this);
-
-		switchPage(mThread.mThreadId, 1);
 	}
 
-	void setWebViewContent(String content) {
+	public void setWebViewContent(String content) {
 		String mimeType = "text/html; charset=utf-8";
 		String encoding = "utf-8";
 
@@ -121,33 +119,36 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		mUIHandler.sendMessage(msg);
 	}
 
-	String formatHKGPageToHTML(HKGPage page) {
+	protected String formatHKGPageToHTML(HKGPage page) {
 
 		StringBuffer s = new StringBuffer(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-		s.append("\nTitle:" + mThread.mTitle);
-		s.append("\nPages Count:" + mThread.mSelectedPage + "/"
+		s.append("<br />Title:" + mThread.mTitle);
+		s.append("<br />Pages Count:" + mThread.mSelectedPage + "/"
 				+ mThread.mPageCount);
-		s.append("\nReplies Count:" + page.getReplyList().size());
-		int count = 0;
+		s.append("<br />Replies Count:" + page.getReplyList().size());
+		int count = 25 * (page.mPageNo - 1);
+		if (page.mPageNo > 1) {
+			count++;
+		}
 		for (HKGReply reply : page.getReplyList()) {
-			s.append("\n<hr/>#" + count++);
+			s.append("<br/><hr/>#" + count++ + "<br />");
 			s.append(reply.toString());
 		}
 		return s.toString();
 	}
 
-	void switchPage(final String threadId, final int pageNo) {
-
-		new Thread() {
-			public void run() {
-				Log.d(TAG, "switchPage(), reading thread by page");
-
-				// mThread = new HKGThread(threadId, null, -1, null, -1, -1);
-				mController.readThreadByPage(mThread, pageNo);
-			}
-		}.start();
-	}
+	// void switchPage(final String threadId, final int pageNo) {
+	//
+	// new Thread() {
+	// public void run() {
+	// Log.d(TAG, "switchPage(), reading thread by page");
+	//
+	// // mThread = new HKGThread(threadId, null, -1, null, -1, -1);
+	// mController.readThreadByPage(mThread, pageNo);
+	// }
+	// }.start();
+	// }
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

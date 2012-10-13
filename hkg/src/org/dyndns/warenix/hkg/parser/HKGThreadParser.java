@@ -22,7 +22,7 @@ public class HKGThreadParser extends HKGParser {
 
 	private Step mCurrentStep = Step.FIND_THERAD_TITLE;
 
-	private HKGPage mPage = new HKGPage();
+	private HKGPage mPage;
 
 	int selectedPage = -1;
 	int pageCount = 0;
@@ -32,6 +32,10 @@ public class HKGThreadParser extends HKGParser {
 	HKGThread mThread;
 
 	StringBuffer content = new StringBuffer();
+
+	public HKGThreadParser(int pageNo) {
+		mPage = new HKGPage(pageNo);
+	}
 
 	@Override
 	public boolean feed(String inputLine) {
@@ -70,7 +74,7 @@ public class HKGThreadParser extends HKGParser {
 					if (mThread.mPageCount == 1) {
 						mThread.mSelectedPage = 1;
 					} else {
-						mThread.mSelectedPage = selectedPage - 1;
+						mThread.mSelectedPage = selectedPage - 2;
 					}
 					mCurrentStep = Step.FIND_THREAD_REPLY;
 				} else if (!pageSectionFound

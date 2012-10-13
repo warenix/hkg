@@ -35,8 +35,18 @@ public class HKGThread {
 		mPageCount = pageCount;
 	}
 
+	public HKGPage getPage(int pageNo) {
+		return mPageMap.get(pageNo);
+	}
+
 	public static class HKGPage {
-		static final int MAX_REPLIES_PER_PAGE = 26;
+		static final int MAX_REPLIES_PER_PAGE = 25;
+		int mPageNo;
+
+		public HKGPage(int pageNo) {
+			mPageNo = pageNo;
+		}
+
 		ArrayList<HKGReply> mReplyList = new ArrayList<HKGReply>();
 
 		public void addReply(HKGReply reply) {

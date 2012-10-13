@@ -30,7 +30,8 @@ public class HKGController {
 	}
 
 	public void readThreadByPage(HKGThread thread, int pageNo) {
-		HKGPage cachedPage = thread.mPageMap.get(pageNo);
+		// HKGPage cachedPage = thread.mPageMap.get(pageNo);
+		HKGPage cachedPage = thread.getPage(pageNo);
 		boolean hasNoCache = cachedPage == null;
 
 		boolean mayHaveNewReplyInThisPage = !hasNoCache
@@ -40,16 +41,15 @@ public class HKGController {
 				&& cachedPage.getReplyList().size() == HKGPage.MAX_REPLIES_PER_PAGE;
 		boolean mayHaveNewReply = mayHaveNewReplyInThisPage
 				|| mayHaveNewReplyInNewLastPage;
-//		if (hasNoCache || mayHaveNewReply) {
-			try {
-				HKGThreadParser parser = new HKGThreadParser();
-				parser.setHKGThread(thread);
-				parser.parse(PageRequest.getReadThreadUrl(thread.mThreadId,
-						pageNo));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-//		}
+		// if (hasNoCache || mayHaveNewReply) {
+		try {
+			HKGThreadParser parser = new HKGThreadParser(pageNo);
+			parser.setHKGThread(thread);
+			parser.parse(PageRequest.getReadThreadUrl(thread.mThreadId, pageNo));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// }
 		if (mListener != null) {
 			mListener.onThreadLoaded(thread);
 		}

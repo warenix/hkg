@@ -4,11 +4,8 @@ import java.util.ArrayList;
 
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.parser.HKGListParser;
-import org.dyndns.warenix.hkg.parser.HKGListParser.HKGList;
-import org.dyndns.warenix.lab.hkg.R;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,6 +42,11 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 			if (getActivity() != null) {
 				adapter = new ArrayAdapter<HKGThread>(getActivity(),
 						android.R.layout.simple_list_item_2, threadList) {
+
+					public HKGThread getItem(int position) {
+						return threadList.get(position);
+					}
+
 					@Override
 					public View getView(int position, View convertView,
 							ViewGroup parent) {
@@ -69,8 +71,9 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 							row.getText1().setTextColor(Color.BLACK);
 						}
 						row.getText2().setText(
-								String.format("%s \u2764 %d\t\t[%s]", topic.mUser,
-										topic.mRating, topic.mThreadId));
+								String.format("%s \u2764 %d\t\t[%s]",
+										topic.mUser, topic.mRating,
+										topic.mThreadId));
 
 						return row;
 					}
@@ -87,28 +90,13 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 		return f;
 	}
 
-	private HKGTopicFragment() {
+	public HKGTopicFragment() {
 		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		new Thread() {
-			public void run() {
-				HKGController controller = HKGController.getController();
-				controller.setHKGListener(HKGTopicFragment.this);
-				controller.readTopicByPage(mType, mPageNo);
-				// parser = new HKGListParser();
-				// try {
-				// parser.parse(PageRequest.getListUrl(mType, mPageNo));
-				// mHKGThreadHandler.sendEmptyMessage(0);
-				// } catch (IOException e) {
-				// e.printStackTrace();
-				// }
-			}
-		}.start();
-
 	}
 
 	@Override

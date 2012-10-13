@@ -24,7 +24,7 @@ public class HKGListParser extends HKGParser {
 
 	private Step mCurrentStep = Step.FIND_TOPIC_ID;
 
-	private int pageCount = -1;
+	private int pageCount = 0;
 
 	private HKGThread mThread;
 	private HKGList mHKGList = new HKGList();
@@ -80,7 +80,7 @@ public class HKGListParser extends HKGParser {
 			case FIND_TOPIC_PAGE_COUNT:
 				pageCount++;
 				if ("</select>".equals(inputLine)) {
-					mThread.mPageCount = pageCount - 2;
+					mThread.mPageCount = pageCount - 1;
 					mHKGList.addHKGThread(mThread);
 
 					pageCount = 0;
