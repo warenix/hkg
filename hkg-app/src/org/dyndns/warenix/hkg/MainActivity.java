@@ -22,8 +22,6 @@ public class MainActivity extends ABSActionbarActivity implements
 
 	static final String TAG = "HKGMain";
 
-	int mCurrentTopicPage = 1;
-
 	enum FragmentTag {
 		STATIC, TOPIC, THREAD
 	}
@@ -33,15 +31,18 @@ public class MainActivity extends ABSActionbarActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		showTopic("BW", mCurrentTopicPage);
-
 		if (savedInstanceState == null) {
 			// use a fragment to hold data across orientatoin change
 			getSupportFragmentManager().beginTransaction()
 					.add(new StaticFragment(), FragmentTag.STATIC.toString())
 					.commit();
-			loadTopic("BW", mCurrentTopicPage);
+			getSupportFragmentManager().executePendingTransactions();
+
+			showTopic("BW", getStaticFragment().getCurrentTopicPageNo());
+			loadTopic("BW", getStaticFragment().getCurrentTopicPageNo());
 		} else {
+			showTopic("BW", getStaticFragment().getCurrentTopicPageNo());
+
 			// restore state
 			StaticFragment sf = getStaticFragment();
 			onTopicLoaded(sf.mType, sf.mPageNo, sf.mThreadList);
@@ -125,6 +126,9 @@ public class MainActivity extends ABSActionbarActivity implements
 			}
 		}.start();
 
+		Toast.makeText(MainActivity.this,
+				"Page " + getStaticFragment().getCurrentTopicPageNo(),
+				Toast.LENGTH_SHORT).show();
 	}
 
 	void loadThread(final HKGThread thread, final int pageNo) {
@@ -187,7 +191,9 @@ public class MainActivity extends ABSActionbarActivity implements
 			public boolean onMenuItemClick(MenuItem item) {
 				if (getStaticFragment().mThread == null) {
 					// showTopic("BW", 1);
-					loadTopic("BW", 1);
+					int newPageNo = 1;
+					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+					loadTopic("BW", newPageNo);
 				}
 				return true;
 			}
@@ -200,9 +206,9 @@ public class MainActivity extends ABSActionbarActivity implements
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				if (getStaticFragment().mThread == null) {
-					loadTopic("BW", ++mCurrentTopicPage);
-				}
+				int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
+				getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+				loadTopic("BW", newPageNo);
 				return true;
 			}
 		});
@@ -214,7 +220,7 @@ public class MainActivity extends ABSActionbarActivity implements
 
 		if (getStaticFragment().mThread != null) {
 			getStaticFragment().saveThread(null);
-			mCurrentTopicPage = 1;
+			getStaticFragment().saveCurrentTopicPageNo(1);
 			setActionBarList(null, -1);
 		}
 	}
@@ -223,13 +229,24 @@ public class MainActivity extends ABSActionbarActivity implements
 	public void onTopicLoaded(String type, int pageNo,
 			ArrayList<HKGThread> threadList) {
 		Log.d(TAG, String.format("onTopicLoaded pageNo[%d]", pageNo));
-		// save it so later we can resue it
-		getStaticFragment().saveTopic(type, pageNo, threadList);
 
-		HKGTopicFragment f = (HKGTopicFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.TOPIC.toString());
-		if (f != null) {
-			f.onTopicLoaded(type, pageNo, threadList);
+		if (threadList.size() > 0) {
+			// save it so later we can resue it
+			getStaticFragment().saveTopic(type, pageNo, threadList);
+
+			HKGTopicFragment f = (HKGTopicFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.TOPIC.toString());
+			if (f != null) {
+				f.onTopicLoaded(type, pageNo, threadList);
+			}
+		} else {
+			// TODO find a better way to display this
+			MainActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this, "No thread in this page",
+							Toast.LENGTH_SHORT).show();
+				}
+			});
 		}
 	}
 
@@ -256,6 +273,9 @@ public class MainActivity extends ABSActionbarActivity implements
 		// thread fragment
 		private HKGThread mThread;
 
+		// topic pageNo
+		int mCurrentTopicPage = 1;
+
 		public StaticFragment() {
 			setRetainInstance(true);
 		}
@@ -269,6 +289,14 @@ public class MainActivity extends ABSActionbarActivity implements
 			mType = type;
 			mPageNo = pageNo;
 			mThreadList = threadList;
+		}
+
+		public void saveCurrentTopicPageNo(int pageNo) {
+			mCurrentTopicPage = pageNo;
+		}
+
+		public int getCurrentTopicPageNo() {
+			return mCurrentTopicPage;
 		}
 	}
 }
