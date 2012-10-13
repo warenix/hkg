@@ -95,16 +95,12 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	}
 
 	public void setWebViewContent(String content) {
-		String mimeType = "text/html; charset=utf-8";
-		String encoding = "utf-8";
-
 		StringBuffer s = new StringBuffer();
 		s.append("<html><style type=\"text/css\">");
 		s.append(mCss);
 		s.append("</style>");
 		s.append(content);
 		s.append("</html>");
-		//mWebView.loadData(s.toString(), mimeType, encoding);
 		loadAndCleanData(mWebView, s.toString());
 	}
 
@@ -162,15 +158,18 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	}
 
 	/**
-	 * prevent "web page not available" when 
+	 * prevent "web page not available" when
+	 * 
 	 * @param webView
 	 * @param html
 	 */
 	public static void loadAndCleanData(WebView webView, String html) {
 		try {
+			String mimeType = "text/html; charset=utf-8";
+			String encoding = "utf-8";
 			webView.loadData(
 					URLEncoder.encode(html, "utf-8").replaceAll("\\+", " "),
-					"text/html", "utf-8");
+					mimeType, encoding);
 		} catch (UnsupportedEncodingException uee) {
 			throw new RuntimeException(
 					"utf-8 encoding failed when loading String into WebView");
