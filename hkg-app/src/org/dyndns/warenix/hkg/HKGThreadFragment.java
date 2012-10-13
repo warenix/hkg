@@ -1,5 +1,7 @@
 package org.dyndns.warenix.hkg;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
@@ -102,7 +104,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		s.append("</style>");
 		s.append(content);
 		s.append("</html>");
-		mWebView.loadData(s.toString(), mimeType, encoding);
+		//mWebView.loadData(s.toString(), mimeType, encoding);
+		loadAndCleanData(mWebView, s.toString());
 	}
 
 	@Override
@@ -156,6 +159,22 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		// MenuItem refresh = menu.add("Save");
 		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 		// | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	}
+
+	/**
+	 * prevent "web page not available" when 
+	 * @param webView
+	 * @param html
+	 */
+	public static void loadAndCleanData(WebView webView, String html) {
+		try {
+			webView.loadData(
+					URLEncoder.encode(html, "utf-8").replaceAll("\\+", " "),
+					"text/html", "utf-8");
+		} catch (UnsupportedEncodingException uee) {
+			throw new RuntimeException(
+					"utf-8 encoding failed when loading String into WebView");
+		}
 	}
 
 }
