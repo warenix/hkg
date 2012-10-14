@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.parser.HKGListParser;
+import org.dyndns.warenix.lab.hkg.R;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -19,7 +20,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TwoLineListItem;
+import android.widget.TextView;
 
 public class HKGTopicFragment extends ListFragment implements HKGListener {
 	HKGListParser parser;
@@ -40,8 +41,51 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 			// hkgList.getHKGThreadList();
 
 			if (getActivity() != null) {
+				// adapter = new ArrayAdapter<HKGThread>(getActivity(),
+				// android.R.layout.simple_list_item_2, threadList) {
+				//
+				// public HKGThread getItem(int position) {
+				// return threadList.get(position);
+				// }
+				//
+				// @Override
+				// public View getView(int position, View convertView,
+				// ViewGroup parent) {
+				// TwoLineListItem row;
+				// if (convertView == null) {
+				// LayoutInflater inflater = (LayoutInflater) getActivity()
+				// .getSystemService(
+				// Context.LAYOUT_INFLATER_SERVICE);
+				// row = (TwoLineListItem) inflater.inflate(
+				// android.R.layout.simple_list_item_2, null);
+				// } else {
+				// row = (TwoLineListItem) convertView;
+				// }
+				// HKGThread topic = threadList.get(position);
+				// row.getText1().setText(
+				// String.format("%s -- %d",
+				// Html.fromHtml(topic.mTitle),
+				// topic.mRepliesCount));
+				// if (topic.mRating < 0) {
+				// row.getText1().setTextColor(Color.GRAY);
+				// } else {
+				// row.getText1().setTextColor(Color.BLACK);
+				// }
+				// row.getText2().setText(
+				// String.format("%s \u2764 %d\t\t[%s]",
+				// topic.mUser, topic.mRating,
+				// topic.mThreadId));
+				//
+				// return row;
+				// }
 				adapter = new ArrayAdapter<HKGThread>(getActivity(),
 						android.R.layout.simple_list_item_2, threadList) {
+
+					class ViewHolder {
+						TextView line1;
+						TextView line2;
+						TextView left;
+					}
 
 					public HKGThread getItem(int position) {
 						return threadList.get(position);
@@ -50,30 +94,39 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 					@Override
 					public View getView(int position, View convertView,
 							ViewGroup parent) {
-						TwoLineListItem row;
+						View row;
 						if (convertView == null) {
 							LayoutInflater inflater = (LayoutInflater) getActivity()
 									.getSystemService(
 											Context.LAYOUT_INFLATER_SERVICE);
-							row = (TwoLineListItem) inflater.inflate(
-									android.R.layout.simple_list_item_2, null);
+							row = inflater
+									.inflate(R.layout.thread_header, null);
+							ViewHolder viewHolder = new ViewHolder();
+							viewHolder.left = (TextView) row
+									.findViewById(R.id.left);
+							viewHolder.line1 = (TextView) row
+									.findViewById(R.id.line1);
+							viewHolder.line2 = (TextView) row
+									.findViewById(R.id.line2);
+							row.setTag(viewHolder);
 						} else {
-							row = (TwoLineListItem) convertView;
+							row = convertView;
 						}
+						ViewHolder viewHolder = (ViewHolder) row.getTag();
+
 						HKGThread topic = threadList.get(position);
-						row.getText1().setText(
-								String.format("%s -- %d",
-										Html.fromHtml(topic.mTitle),
-										topic.mRepliesCount));
+						viewHolder.line1.setText(String.format("%s",
+								Html.fromHtml(topic.mTitle)));
 						if (topic.mRating < 0) {
-							row.getText1().setTextColor(Color.GRAY);
+							viewHolder.line1.setTextColor(Color.GRAY);
 						} else {
-							row.getText1().setTextColor(Color.BLACK);
+							viewHolder.line1.setTextColor(Color.BLACK);
 						}
-						row.getText2().setText(
-								String.format("%s \u2764 %d\t\t[%s]",
-										topic.mUser, topic.mRating,
-										topic.mThreadId));
+						viewHolder.line2.setText(String.format(
+								"%s \u2764 %d\t\t[%s]", topic.mUser,
+								topic.mRating, topic.mThreadId));
+						viewHolder.left.setText(String.format("%d",
+								topic.mRepliesCount));
 
 						return row;
 					}
