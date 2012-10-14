@@ -8,7 +8,7 @@ import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
-import org.dyndns.warenix.lab.hkg.R;
+import org.dyndns.warenix.hkg.R;
 
 import android.graphics.Color;
 import android.os.Bundle;

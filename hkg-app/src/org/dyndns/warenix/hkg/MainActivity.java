@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.dyndns.warenix.abs.activity.ABSActionbarActivity;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
-import org.dyndns.warenix.lab.hkg.R;
+import org.dyndns.warenix.hkg.R;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
