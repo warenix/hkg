@@ -120,7 +120,7 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 						if (topic.mRating < 0) {
 							viewHolder.line1.setTextColor(Color.GRAY);
 						} else {
-							viewHolder.line1.setTextColor(Color.BLACK);
+							viewHolder.line1.setTextColor(Color.LTGRAY);
 						}
 						viewHolder.line2.setText(String.format(
 								"%s \u2764 %d\t\t[%s]", topic.mUser,

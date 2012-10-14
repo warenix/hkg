@@ -10,6 +10,7 @@ import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.lab.hkg.R;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,10 +55,14 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		}
 	};
 
-	final String mCss = ".ViewQuote {border-left: 1px solid;"
+	final String mCssBlackColorTheme = " #hkgcontent{background:black; color:#EB8921} a {color:#0099CC}";
+	String mCssColorTheme = mCssBlackColorTheme;
+	final String mCssViewQuote = ".ViewQuote {border-left: 1px solid;"
 			+ "margin: 0.1em 0;" + "padding: 0.1em 10px;"
 			+ "line-height: 1.45;" + "position: relative;"
 			+ "border-bottom: 2px solid;" + "border-left: 1px solid;" + "}";
+
+	final String mCss = mCssViewQuote + mCssColorTheme;
 
 	public static HKGThreadFragment newInstance(String threadId, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
@@ -85,6 +90,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			mWebView = (WebView) view.findViewById(R.id.webView1);
 			mWebView.getSettings().setDefaultTextEncodingName("utf-8");
 			mWebView.getSettings().setBuiltInZoomControls(true);
+			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
+			mWebView.setBackgroundColor(Color.BLACK);
 			setWebViewContent(mLoadingHtml);
 		}
 		return view;
@@ -99,8 +106,10 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		s.append("<html><style type=\"text/css\">");
 		s.append(mCss);
 		s.append("</style>");
+		s.append("<div id=\"hkgcontent\">");
 		s.append(content);
 		s.append("</html>");
+		s.append("</div>");
 		loadAndCleanData(mWebView, s.toString());
 	}
 
@@ -122,6 +131,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 		StringBuffer s = new StringBuffer(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+
 		s.append("<br />Title:" + mThread.mTitle);
 		s.append("<br />Pages Count:" + mThread.mSelectedPage + "/"
 				+ mThread.mPageCount);
