@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.dyndns.warenix.abs.activity.ABSActionbarActivity;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
-import org.dyndns.warenix.hkg.R;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -190,6 +189,8 @@ public class MainActivity extends ABSActionbarActivity implements
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				if (getStaticFragment().mThread == null) {
+					clearTopicList();
+
 					// showTopic("BW", 1);
 					int newPageNo = 1;
 					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
@@ -206,6 +207,8 @@ public class MainActivity extends ABSActionbarActivity implements
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
+				clearTopicList();
+
 				int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
 				getStaticFragment().saveCurrentTopicPageNo(newPageNo);
 				loadTopic("BW", newPageNo);
@@ -261,6 +264,14 @@ public class MainActivity extends ABSActionbarActivity implements
 				.findFragmentByTag(FragmentTag.THREAD.toString());
 		if (f != null) {
 			f.onThreadLoaded(thread);
+		}
+	}
+
+	private void clearTopicList() {
+		HKGTopicFragment f = (HKGTopicFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.TOPIC.toString());
+		if (f != null) {
+			f.clear();
 		}
 	}
 

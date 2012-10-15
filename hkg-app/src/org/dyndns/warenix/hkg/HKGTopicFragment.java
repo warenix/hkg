@@ -3,8 +3,6 @@ package org.dyndns.warenix.hkg;
 import java.util.ArrayList;
 
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
-import org.dyndns.warenix.hkg.parser.HKGListParser;
-import org.dyndns.warenix.hkg.R;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -23,7 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class HKGTopicFragment extends ListFragment implements HKGListener {
-	HKGListParser parser;
 	WebView mWebView;
 
 	int mPageNo;
@@ -186,5 +183,12 @@ public class HKGTopicFragment extends ListFragment implements HKGListener {
 	@Override
 	public void onThreadLoaded(HKGThread thread) {
 
+	}
+
+	public void clear() {
+		if (adapter != null) {
+			adapter.clear();
+			adapter.notifyDataSetChanged();
+		}
 	}
 }
