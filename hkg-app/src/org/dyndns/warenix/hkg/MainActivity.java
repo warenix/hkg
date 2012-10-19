@@ -7,6 +7,8 @@ import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -25,10 +27,34 @@ public class MainActivity extends ABSActionbarActivity implements
 		STATIC, TOPIC, THREAD
 	}
 
+	enum HomeButtonUIState {
+		Up, Normal
+	}
+
+	/**
+	 * handle update home button ui
+	 */
+	final Handler mUpdateHomeButtonUIStateHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			HomeButtonUIState state = HomeButtonUIState.values()[msg.what];
+			switch (state) {
+			case Up:
+				getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+				break;
+			case Normal:
+				getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+				break;
+			}
+		}
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		// always enable home button interaction
+		getSupportActionBar().setHomeButtonEnabled(true);
 
 		if (savedInstanceState == null) {
 			// use a fragment to hold data across orientatoin change
@@ -50,11 +76,27 @@ public class MainActivity extends ABSActionbarActivity implements
 			HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.THREAD.toString());
 			if (tf != null) {
+				setDisplayHomeButtonUp(true);
+
 				setPageSwitcher(getStaticFragment().mThread);
 				// switchThreadPage(getStaticFragment().mThread);
 			}
 		}
 
+	}
+
+	/**
+	 * Set display home button as up or not
+	 * 
+	 * The update will be done on UI thread.
+	 * 
+	 * @param showAsUp
+	 */
+	private void setDisplayHomeButtonUp(boolean showAsUp) {
+		Message msg = new Message();
+		msg.what = showAsUp ? HomeButtonUIState.Up.ordinal()
+				: HomeButtonUIState.Normal.ordinal();
+		mUpdateHomeButtonUIStateHandler.sendMessage(msg);
 	}
 
 	protected StaticFragment getStaticFragment() {
@@ -222,10 +264,22 @@ public class MainActivity extends ABSActionbarActivity implements
 		super.onBackPressed();
 
 		if (getStaticFragment().mThread != null) {
+			setDisplayHomeButtonUp(false);
 			getStaticFragment().saveThread(null);
 			getStaticFragment().saveCurrentTopicPageNo(1);
 			setActionBarList(null, -1);
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			if (getStaticFragment().mThread != null) {
+				this.onBackPressed();
+			}
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -257,6 +311,7 @@ public class MainActivity extends ABSActionbarActivity implements
 	public void onThreadLoaded(HKGThread thread) {
 		Log.d(TAG, String.format("onThreadLoaded selectedPage[%s]",
 				thread.mSelectedPage));
+		setDisplayHomeButtonUp(true);
 		// save it so later we can resue it
 		getStaticFragment().saveThread(thread);
 

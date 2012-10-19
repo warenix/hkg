@@ -8,7 +8,6 @@ import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
-import org.dyndns.warenix.hkg.R;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +34,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	static final String mLoadingHtml = "Loading... Please wait";
 	static final String mEmptyHtml = "Cannot open thread.";
+
 
 	/**
 	 * Currently displayed thread
