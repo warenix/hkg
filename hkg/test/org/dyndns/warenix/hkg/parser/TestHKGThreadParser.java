@@ -5,7 +5,7 @@ import org.dyndns.warenix.hkg.parser.HKGParser.PageRequest;
 
 public class TestHKGThreadParser {
 	public static void main(String args[]) {
-		HKGThreadParser parser = new HKGThreadParser();
+		HKGThreadParser parser = new HKGThreadParser(1);
 		try {
 			String threadId = "3976935";
 			int pageNo = 2;
