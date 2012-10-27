@@ -2,8 +2,10 @@ package org.dyndns.warenix.hkg;
 
 import java.util.ArrayList;
 
-import org.dyndns.warenix.abs.activity.ABSActionbarActivity;
+import org.dyndns.warenix.abs.activity.SlidingActionBarActivity;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
+import org.dyndns.warenix.hkg.HKGForumFragment.HKGForumListener;
+import org.dyndns.warenix.hkg.HKGThread.HKGForum;
 import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
 
 import android.os.Bundle;
@@ -18,8 +20,12 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class MainActivity extends ABSActionbarActivity implements HKGListener,
-		HKGThreadListener {
+public class MainActivity extends SlidingActionBarActivity implements
+		HKGListener, HKGThreadListener, HKGForumListener {
+
+	public MainActivity() {
+		super(R.string.app_name);
+	}
 
 	static final String TAG = "HKGMain";
 
@@ -63,10 +69,15 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 					.commit();
 			getSupportFragmentManager().executePendingTransactions();
 
-			showTopic("BW", getStaticFragment().getCurrentTopicPageNo());
-			loadTopic("BW", getStaticFragment().getCurrentTopicPageNo());
+			// provide default forum
+			HKGForum forum = new HKGForum(null, "BW");
+			getStaticFragment().saveCurrentForum(forum);
+
+			showTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
+			loadTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
 		} else {
-			showTopic("BW", getStaticFragment().getCurrentTopicPageNo());
+			HKGForum forum = getStaticFragment().getCurrentForum();
+			showTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
 
 			// restore state
 			StaticFragment sf = getStaticFragment();
@@ -150,6 +161,7 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 		Bundle bundle = HKGTopicFragment2.getShowTopicBundle(type, pageNo);
 		f.setArguments(bundle);
 		f.setHKGThreadListener(this);
+
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
 		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
@@ -243,8 +255,9 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 					HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
 							.findFragmentByTag(FragmentTag.TOPIC.toString());
 					if (f != null) {
+						HKGForum forum = getStaticFragment().getCurrentForum();
 						Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
-								"BW", 1);
+								forum.mType, 1);
 						f.refreshTopic(bundle);
 					}
 				}
@@ -267,8 +280,9 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 					int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
 					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
 					// loadTopic("BW", newPageNo);
-					Bundle bundle = HKGTopicFragment2.getShowTopicBundle("BW",
-							newPageNo);
+					HKGForum forum = getStaticFragment().getCurrentForum();
+					Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+							forum.mType, newPageNo);
 					f.refreshTopic(bundle);
 				}
 
@@ -295,6 +309,7 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 		case android.R.id.home:
 			if (getStaticFragment().mThread != null) {
 				this.onBackPressed();
+				return true;
 			}
 		}
 		return super.onOptionsItemSelected(item);
@@ -348,7 +363,10 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 		}
 	}
 
-	static class StaticFragment extends Fragment {
+	public static class StaticFragment extends Fragment {
+		// current forum
+		private HKGForum mForum;
+
 		// topic fragment
 		private String mType;
 		private int mPageNo;
@@ -381,6 +399,50 @@ public class MainActivity extends ABSActionbarActivity implements HKGListener,
 
 		public int getCurrentTopicPageNo() {
 			return mCurrentTopicPage;
+		}
+
+		public void saveCurrentForum(HKGForum forum) {
+			mForum = forum;
+		}
+
+		public HKGForum getCurrentForum() {
+			return mForum;
+		}
+	}
+
+	@Override
+	public Fragment getBehindFragment() {
+		HKGForumFragment f = HKGForumFragment.newInstance();
+		f.setHKGForumListener(this);
+		return f;
+	}
+
+	@Override
+	public void onHKGForumSelected(HKGForum forum) {
+		// UI work
+		// 1. remove thread fragment if any
+		HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.THREAD.toString());
+		if (tf != null) {
+			getSupportFragmentManager().popBackStackImmediate();
+			// reset actionbar list adpater
+			getStaticFragment().saveThread(null);
+			getStaticFragment().saveCurrentTopicPageNo(1);
+			setActionBarList(null, -1);
+		}
+		// 2. collapse hidden fragment
+		toggle();
+
+		getStaticFragment().saveCurrentForum(forum);
+
+		int newPageNo = 1;
+		getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+		HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.TOPIC.toString());
+		if (f != null) {
+			Bundle bundle = HKGTopicFragment2
+					.getShowTopicBundle(forum.mType, 1);
+			f.refreshTopic(bundle);
 		}
 	}
 
