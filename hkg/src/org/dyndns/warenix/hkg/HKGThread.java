@@ -113,4 +113,14 @@ public class HKGThread {
 		}
 	}
 
+	public static class HKGForum {
+		public HKGForum(String name, String type) {
+			mName = name;
+			mType = type;
+		}
+
+		public String mName;
+		public String mType;
+	}
+
 }

@@ -10,6 +10,7 @@ import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.hkg.parser.HKGListParser;
 import org.dyndns.warenix.hkg.parser.HKGParser.PageRequest;
 import org.dyndns.warenix.hkg.parser.HKGThreadParser;
+import org.dyndns.warenix.hkgcp.R;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -49,10 +50,14 @@ public class HKGProvider extends ContentProvider {
 		Log.d(TAG, String.format("getType() uri[%s]", uri));
 		switch (sUriMatcher.match(uri)) {
 		case HKGMetaData.TYPE_LIST_FORUM:
+			return HKGMetaData.CONTENT_TYPE_HKG_FORUM_LIST;
+
 		case HKGMetaData.TYPE_LIST_FORUM_THREAD_BY_PAGE:
 			return HKGMetaData.CONTENT_TYPE_HKG_THREAD_LIST;
+
 		case HKGMetaData.TYPE_SHOW_THREAD_BY_PAGE:
 			return HKGMetaData.CONTENT_TYPE_HKG_THREAD_ONE;
+
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
@@ -74,6 +79,8 @@ public class HKGProvider extends ContentProvider {
 		Log.d(TAG, String.format("query() uri[%s]", uri));
 		switch (sUriMatcher.match(uri)) {
 		case HKGMetaData.TYPE_LIST_FORUM:
+			return queryAllHKGForum(uri, projection, selection, selectionArgs,
+					sortOrder);
 		case HKGMetaData.TYPE_LIST_FORUM_THREAD_BY_PAGE:
 			return queryAllCentralBeauty(uri, projection, selection,
 					selectionArgs, sortOrder);
@@ -155,6 +162,24 @@ public class HKGProvider extends ContentProvider {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return cursor;
+	}
+
+	private Cursor queryAllHKGForum(Uri uri, String[] projection,
+			String selection, String[] selectionArgs, String sortOrder) {
+
+		MatrixCursor cursor = new MatrixCursor(
+				HKGMetaData.MATRIX_FORUM_CURSOR_COLUMNS);
+
+		String[] forumNames = getContext().getResources().getStringArray(
+				R.array.forum_name_array);
+		String[] forumTypes = getContext().getResources().getStringArray(
+				R.array.forum_type_array);
+		int l = forumNames.length;
+
+		for (int i = 0; i < l; ++i) {
+			cursor.addRow(new Object[] { i, forumNames[i], forumTypes[i] });
 		}
 		return cursor;
 	}

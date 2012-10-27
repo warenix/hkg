@@ -26,6 +26,7 @@ public class HKGMetaData {
 			"content://%s/%s", AUTHORITY, PATH_SHOW_THREAD_BY_PAGE));
 
 	// content type
+	public static final String CONTENT_TYPE_HKG_FORUM_LIST = "vnd.android.cursor.dir/vnd.org.dyndns.warenix.hkg.HKGForm";
 	public static final String CONTENT_TYPE_HKG_THREAD_LIST = "vnd.android.cursor.dir/vnd.org.dyndns.warenix.hkg.HKGThread";
 	public static final String CONTENT_TYPE_HKG_THREAD_ONE = "vnd.android.cursor.item/vnd.org.dyndns.warenix.hkg.HKGThread";
 
@@ -36,6 +37,9 @@ public class HKGMetaData {
 
 	public static final String[] MATRIX_THREAD_BY_PAGE_CURSOR_COLUMNS = new String[] {
 			ThreadColumns.user, ThreadColumns.postDate, ThreadColumns.content };
+
+	public static final String[] MATRIX_FORUM_CURSOR_COLUMNS = new String[] {
+			ForumColumns.ID, ForumColumns.name, ForumColumns.type };
 
 	public static class BaseColumns {
 		public static final String ID = "_id";
@@ -52,6 +56,12 @@ public class HKGMetaData {
 		public static final String content = "content";
 	}
 
+	public static class ForumColumns {
+		public static final String ID = "_id";
+		public static final String name = "name";
+		public static final String type = "type";
+	}
+
 	public static Uri getListForumThreadByPage(String forum, int pageNo) {
 		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
 				String.format("/forum/%s/%d", forum, pageNo)));
@@ -60,5 +70,10 @@ public class HKGMetaData {
 	public static Uri getUriListThreadByPage(String threadId, int pageNo) {
 		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
 				String.format("/thread/%s/%d", threadId, pageNo)));
+	}
+
+	public static Uri getUriListForum() {
+		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
+				String.format("/forum")));
 	}
 }
