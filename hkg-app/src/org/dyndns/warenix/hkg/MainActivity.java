@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.dyndns.warenix.abs.activity.ABSActionbarActivity;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
-import org.dyndns.warenix.hkg.HKGTopicFragment.HKGThreadListener;
+import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,8 +18,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class MainActivity extends ABSActionbarActivity implements
-		HKGThreadListener, HKGListener {
+public class MainActivity extends ABSActionbarActivity implements HKGListener,
+		HKGThreadListener {
 
 	static final String TAG = "HKGMain";
 
@@ -137,15 +137,18 @@ public class MainActivity extends ABSActionbarActivity implements
 	}
 
 	void showTopic(final String type, final int pageNo) {
-		HKGTopicFragment cf = (HKGTopicFragment) getSupportFragmentManager()
+		HKGTopicFragment2 cf = (HKGTopicFragment2) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.TOPIC.toString());
 		if (cf != null) {
-			((HKGTopicFragment) cf).setHKGThreadListener(this);
+			((HKGTopicFragment2) cf).setHKGThreadListener(this);
 			return;
 		}
 
 		// display UI for thread list
-		HKGTopicFragment f = HKGTopicFragment.newInstance(type, pageNo);
+		// HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
+		HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
+		Bundle bundle = HKGTopicFragment2.getShowTopicBundle(type, pageNo);
+		f.setArguments(bundle);
 		f.setHKGThreadListener(this);
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
@@ -236,7 +239,14 @@ public class MainActivity extends ABSActionbarActivity implements
 					// showTopic("BW", 1);
 					int newPageNo = 1;
 					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
-					loadTopic("BW", newPageNo);
+					// loadTopic("BW", newPageNo);
+					HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+							.findFragmentByTag(FragmentTag.TOPIC.toString());
+					if (f != null) {
+						Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+								"BW", 1);
+						f.refreshTopic(bundle);
+					}
 				}
 				return true;
 			}
@@ -251,9 +261,17 @@ public class MainActivity extends ABSActionbarActivity implements
 			public boolean onMenuItemClick(MenuItem item) {
 				clearTopicList();
 
-				int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
-				getStaticFragment().saveCurrentTopicPageNo(newPageNo);
-				loadTopic("BW", newPageNo);
+				HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.TOPIC.toString());
+				if (f != null) {
+					int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
+					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+					// loadTopic("BW", newPageNo);
+					Bundle bundle = HKGTopicFragment2.getShowTopicBundle("BW",
+							newPageNo);
+					f.refreshTopic(bundle);
+				}
+
 				return true;
 			}
 		});
@@ -291,10 +309,10 @@ public class MainActivity extends ABSActionbarActivity implements
 			// save it so later we can resue it
 			getStaticFragment().saveTopic(type, pageNo, threadList);
 
-			HKGTopicFragment f = (HKGTopicFragment) getSupportFragmentManager()
+			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.TOPIC.toString());
 			if (f != null) {
-				f.onTopicLoaded(type, pageNo, threadList);
+				// f.onTopicLoaded(type, pageNo, threadList);
 			}
 		} else {
 			// TODO find a better way to display this
@@ -323,10 +341,10 @@ public class MainActivity extends ABSActionbarActivity implements
 	}
 
 	private void clearTopicList() {
-		HKGTopicFragment f = (HKGTopicFragment) getSupportFragmentManager()
+		HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.TOPIC.toString());
 		if (f != null) {
-			f.clear();
+			// f.clear();
 		}
 	}
 
@@ -365,4 +383,5 @@ public class MainActivity extends ABSActionbarActivity implements
 			return mCurrentTopicPage;
 		}
 	}
+
 }
