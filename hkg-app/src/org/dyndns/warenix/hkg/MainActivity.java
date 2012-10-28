@@ -47,8 +47,10 @@ public class MainActivity extends SlidingActionBarActivity implements
 			getSupportFragmentManager().executePendingTransactions();
 
 			// provide default forum
-			HKGForum forum = new HKGForum(null, "BW");
+			HKGForum forum = new HKGForum("吹水台", "BW");
 			getStaticFragment().saveCurrentForum(forum);
+
+			updateTitle();
 
 			showTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
 			loadTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
@@ -59,6 +61,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 			// restore state
 			StaticFragment sf = getStaticFragment();
 			onTopicLoaded(sf.mType, sf.mPageNo, sf.mThreadList);
+
+			updateTitle();
 
 			// restore thread is loaded
 			HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
@@ -118,10 +122,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		}
 
 		// display UI for thread list
-		// HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
 		HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
-		Bundle bundle = HKGTopicFragment2.getShowTopicBundle(type, pageNo);
-		f.setArguments(bundle);
 		f.setHKGThreadListener(this);
 
 		FragmentTransaction ft = this.getSupportFragmentManager()
@@ -221,6 +222,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 						Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
 								forum.mType, 1);
 						f.refreshTopic(bundle);
+
+						updateTitle();
 					}
 				}
 				return true;
@@ -246,6 +249,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 					Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
 							forum.mType, newPageNo);
 					f.refreshTopic(bundle);
+
+					updateTitle();
 				}
 
 				return true;
@@ -404,6 +409,14 @@ public class MainActivity extends SlidingActionBarActivity implements
 					.getShowTopicBundle(forum.mType, 1);
 			f.refreshTopic(bundle);
 		}
+
+		updateTitle();
 	}
 
+	public void updateTitle() {
+		String appName = getResources().getString(R.string.app_name);
+		HKGForum forum = getStaticFragment().getCurrentForum();
+		this.setTitle(String.format("%s@%s - %d", appName, forum.mName,
+				getStaticFragment().getCurrentTopicPageNo()));
+	}
 }
