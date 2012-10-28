@@ -31,13 +31,31 @@ public class HKGTopicFragment2 extends ListFragment implements
 	CursorAdapter mAdapter;
 	HKGThreadListener mListener;
 
+	/**
+	 * Create a new instance and load topics from given parameters
+	 * 
+	 * @param type
+	 *            forum type
+	 * @param pageNo
+	 *            page no, 1 based.
+	 * @return
+	 */
 	public static HKGTopicFragment2 newInstance(String type, int pageNo) {
 		HKGTopicFragment2 f = new HKGTopicFragment2();
-		// f.mPageNo = pageNo;
-		// f.mType = type;
+		Bundle bundle = getShowTopicBundle(type, pageNo);
+		f.setArguments(bundle);
 		return f;
 	}
 
+	/**
+	 * This bundle control which forum and page no topics to be loaded
+	 * 
+	 * @param forum
+	 *            forum type
+	 * @param pageNo
+	 *            page no, 1 based.
+	 * @return
+	 */
 	public static Bundle getShowTopicBundle(String forum, int pageNo) {
 		Bundle bundle = new Bundle();
 		bundle.putString(BUNDLE_FORUM, forum);
@@ -61,6 +79,13 @@ public class HKGTopicFragment2 extends ListFragment implements
 		getLoaderManager().initLoader(TOPIC_LIST_LOADER, getArguments(), this);
 		mAdapter = new TopicCursorAdapter(getActivity(), null);
 		setListAdapter(mAdapter);
+	}
+
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		getListView().setCacheColorHint(Color.BLACK);
+		setListShown(false);
 	}
 
 	public void refreshTopic(Bundle bundle) {

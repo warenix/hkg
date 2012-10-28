@@ -87,7 +87,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		Log.d(TAG, String.format("onNavigationItemChanged(), switch page[%d]",
 				newPage));
 
-		Toast.makeText(getApplicationContext(), "new page" + newPage,
+		Toast.makeText(getApplicationContext(), "Thread page " + newPage,
 				Toast.LENGTH_SHORT).show();
 
 		// TODO fix switch page. temporarily comment out to test thread fragment
@@ -146,7 +146,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		}.start();
 
 		Toast.makeText(MainActivity.this,
-				"Page " + getStaticFragment().getCurrentTopicPageNo(),
+				"Topic Page " + getStaticFragment().getCurrentTopicPageNo(),
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -264,7 +264,6 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 		if (getStaticFragment().mThread != null) {
 			getStaticFragment().saveThread(null);
-			getStaticFragment().saveCurrentTopicPageNo(1);
 			setActionBarList(null, -1);
 		}
 	}
