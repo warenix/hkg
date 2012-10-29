@@ -14,9 +14,14 @@ import org.dyndns.warenix.hkgcp.R;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -38,11 +43,90 @@ public class HKGProvider extends ContentProvider {
 		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
 				HKGMetaData.PATH_SHOW_THREAD_BY_PAGE,
 				HKGMetaData.TYPE_SHOW_THREAD_BY_PAGE);
+
+		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
+				HKGMetaData.PATH_LIST_BOOKMARK, HKGMetaData.TYPE_LIST_BOOKMARK);
+		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
+				HKGMetaData.PATH_SHOW_BOOKMARK_BY_ID,
+				HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID);
 	}
 
+	// database
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+
+		DatabaseHelper(Context context) {
+			super(context, "hkg.db", null, 1);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			db.execSQL("CREATE TABLE " + "bookmark"
+					+ " ("
+					+ HKGMetaData.BookmarkColumns.ID
+					+ " INTEGER PRIMARY KEY AUTOINCREMENT,"//
+					+ HKGMetaData.BookmarkColumns.threadId
+					+ " VARCHAR(255)," //
+					+ HKGMetaData.BookmarkColumns.user
+					+ " VARCHAR(255)," //
+					+ HKGMetaData.BookmarkColumns.title
+					+ " VARCHAR(255)," //
+					+ HKGMetaData.BookmarkColumns.repliesCount
+					+ " INTEGER," //
+					+ HKGMetaData.BookmarkColumns.rating
+					+ " INTEGER," //
+					+ HKGMetaData.BookmarkColumns.pageCount
+					+ " INTEGER," //
+					+ HKGMetaData.BookmarkColumns.last_page_no_seen
+					+ " INTEGER DEFAULT 1," //
+					+ HKGMetaData.BookmarkColumns.last_modified
+					// + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP"//
+					+ " NOT NULL DEFAULT CURRENT_TIMESTAMP" + //
+					");");
+
+			db.execSQL("CREATE TRIGGER UPDATE_FOOBAR BEFORE UPDATE ON "
+					+ "bookmark" + " BEGIN UPDATE " + "bookmark" + " SET "
+					+ HKGMetaData.BookmarkColumns.last_modified
+					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
+
+			db.execSQL("CREATE TRIGGER INSERT_FOOBAR AFTER INSERT ON "
+					+ "bookmark" + " BEGIN UPDATE " + "bookmark" + " SET "
+					+ HKGMetaData.BookmarkColumns.last_modified
+					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+					+ newVersion + ", which will destroy all old data");
+			db.execSQL("DROP TABLE IF EXISTS " + "bookmark");
+			onCreate(db);
+		}
+	}
+
+	private DatabaseHelper mDBHelper;
+
+	//
+
 	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
-		return 0;
+	public int delete(Uri uri, String where, String[] whereArgs) {
+		if (where == null) {
+			where = "";
+		}
+
+		switch (sUriMatcher.match(uri)) {
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			break;
+
+		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
+			where = where + HKGMetaData.BookmarkColumns.ID + "="
+					+ uri.getLastPathSegment();
+			break;
+		}
+
+		SQLiteDatabase db = mDBHelper.getReadableDatabase();
+		int count = db.delete("bookmark", where, whereArgs);
+		getContext().getContentResolver().notifyChange(uri, null);
+		return count;
 	}
 
 	@Override
@@ -58,19 +142,46 @@ public class HKGProvider extends ContentProvider {
 		case HKGMetaData.TYPE_SHOW_THREAD_BY_PAGE:
 			return HKGMetaData.CONTENT_TYPE_HKG_THREAD_ONE;
 
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			return HKGMetaData.CONTENT_TYPE_HKG_BOOKMARK_LIST;
+
+		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
+			return HKGMetaData.CONTENT_TYPE_HKG_BOOKMARK_ONE;
+
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
 	}
 
 	@Override
-	public Uri insert(Uri arg0, ContentValues arg1) {
-		return null;
+	public Uri insert(Uri uri, ContentValues initialValues) {
+		if (sUriMatcher.match(uri) != HKGMetaData.TYPE_LIST_BOOKMARK) {
+			throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+
+		ContentValues values;
+		if (initialValues != null) {
+			values = new ContentValues(initialValues);
+		} else {
+			values = new ContentValues();
+		}
+
+		SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		long rowId = db.insert("bookmark", null, values);
+		if (rowId > 0) {
+
+			Uri insertedUri = HKGMetaData.getUriShowBookmarkById(rowId);
+			getContext().getContentResolver().notifyChange(insertedUri, null);
+			return insertedUri;
+		}
+
+		throw new SQLException("Failed to insert row into " + uri);
 	}
 
 	@Override
 	public boolean onCreate() {
-		return false;
+		mDBHelper = new DatabaseHelper(getContext());
+		return true;
 	}
 
 	@Override
@@ -86,6 +197,11 @@ public class HKGProvider extends ContentProvider {
 					selectionArgs, sortOrder);
 		case HKGMetaData.TYPE_SHOW_THREAD_BY_PAGE:
 			return queryOneCentralBeuaty(uri, projection, selection,
+					selectionArgs, sortOrder);
+
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
+			return queryAllHKGBookmark(uri, projection, selection,
 					selectionArgs, sortOrder);
 		}
 		return null;
@@ -182,6 +298,32 @@ public class HKGProvider extends ContentProvider {
 			cursor.addRow(new Object[] { i, forumNames[i], forumTypes[i] });
 		}
 		return cursor;
+	}
+
+	private Cursor queryAllHKGBookmark(Uri uri, String[] projection,
+			String selection, String[] selectionArgs, String sortOrder) {
+
+		if (selection == null) {
+			selection = "";
+		}
+		switch (sUriMatcher.match(uri)) {
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			break;
+		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
+			selection = selection + HKGMetaData.BookmarkColumns.ID + "="
+					+ uri.getLastPathSegment();
+			break;
+
+		}
+
+		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		qb.setTables("bookmark");
+		SQLiteDatabase db = mDBHelper.getReadableDatabase();
+		Cursor c = qb.query(db, projection, selection, selectionArgs, null,
+				null, sortOrder);
+
+		c.setNotificationUri(getContext().getContentResolver(), uri);
+		return c;
 	}
 
 	@Override

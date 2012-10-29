@@ -8,10 +8,14 @@ public class HKGMetaData {
 	public static final String PATH_LIST_FORUM = "forum";
 	public static final String PATH_LIST_FORUM_THREAD_BY_PAGE = "forum/*/#";
 	public static final String PATH_SHOW_THREAD_BY_PAGE = "thread/*/#";
+	public static final String PATH_LIST_BOOKMARK = "bookmark";
+	public static final String PATH_SHOW_BOOKMARK_BY_ID = "bookmark/#";
 
 	public static final int TYPE_LIST_FORUM = 10;
 	public static final int TYPE_LIST_FORUM_THREAD_BY_PAGE = 11;
 	public static final int TYPE_SHOW_THREAD_BY_PAGE = 20;
+	public static final int TYPE_LIST_BOOKMARK = 30;
+	public static final int TYPE_SHOW_BOOKMARK_BY_ID = 31;
 
 	// uri
 	/**
@@ -29,6 +33,8 @@ public class HKGMetaData {
 	public static final String CONTENT_TYPE_HKG_FORUM_LIST = "vnd.android.cursor.dir/vnd.org.dyndns.warenix.hkg.HKGForm";
 	public static final String CONTENT_TYPE_HKG_THREAD_LIST = "vnd.android.cursor.dir/vnd.org.dyndns.warenix.hkg.HKGThread";
 	public static final String CONTENT_TYPE_HKG_THREAD_ONE = "vnd.android.cursor.item/vnd.org.dyndns.warenix.hkg.HKGThread";
+	public static final String CONTENT_TYPE_HKG_BOOKMARK_LIST = "vnd.android.cursor.dir/vnd.org.dyndns.warenix.hkg.HKGBookmark";
+	public static final String CONTENT_TYPE_HKG_BOOKMARK_ONE = "vnd.android.cursor.item/vnd.org.dyndns.warenix.hkg.HKGBookmark";
 
 	// matrixcursor columns
 	public static final String[] MATRIX_CURSOR_COLUMNS = new String[] {
@@ -43,6 +49,7 @@ public class HKGMetaData {
 
 	public static class BaseColumns {
 		public static final String ID = "_id";
+		public static final String threadId = "threadId";
 		public static final String user = "user";
 		public static final String repliesCount = "repliesCount";
 		public static final String title = "title";
@@ -62,6 +69,11 @@ public class HKGMetaData {
 		public static final String type = "type";
 	}
 
+	public static class BookmarkColumns extends BaseColumns {
+		public static final String last_page_no_seen = "last_page_no_seen";
+		public static final String last_modified = "last_modified";
+	}
+
 	public static Uri getListForumThreadByPage(String forum, int pageNo) {
 		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
 				String.format("/forum/%s/%d", forum, pageNo)));
@@ -76,4 +88,15 @@ public class HKGMetaData {
 		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
 				String.format("/forum")));
 	}
+
+	public static Uri getUriListBookmark() {
+		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
+				String.format("/bookmark")));
+	}
+
+	public static Uri getUriShowBookmarkById(long id) {
+		return Uri.parse(String.format("content://%s%s", HKGMetaData.AUTHORITY,
+				String.format("/bookmark/%d", id)));
+	}
+
 }
