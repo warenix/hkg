@@ -3,6 +3,7 @@ package org.dyndns.warenix.hkg;
 import java.util.ArrayList;
 
 import org.dyndns.warenix.abs.activity.SlidingActionBarActivity;
+import org.dyndns.warenix.hkg.HKGBookmarkFragment.HKGBookmarkListener;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGForumFragment.HKGForumListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGForum;
@@ -16,10 +17,9 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 public class MainActivity extends SlidingActionBarActivity implements
-		HKGListener, HKGThreadListener, HKGForumListener {
+		HKGListener, HKGThreadListener, HKGForumListener, HKGBookmarkListener {
 
 	public MainActivity() {
 		super(R.string.app_name);
@@ -28,7 +28,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 	static final String TAG = "HKGMain";
 
 	enum FragmentTag {
-		STATIC, TOPIC, THREAD
+		STATIC, HKG_TOPIC, HKG_THREAD, HKG_BOOKMARK
 	}
 
 	@Override
@@ -39,46 +39,107 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// always enable home button interaction
 		getSupportActionBar().setHomeButtonEnabled(true);
 
-		if (savedInstanceState == null) {
-			// use a fragment to hold data across orientatoin change
-			getSupportFragmentManager().beginTransaction()
-					.add(new StaticFragment(), FragmentTag.STATIC.toString())
-					.commit();
-			getSupportFragmentManager().executePendingTransactions();
+		StaticFragment sf = getStaticFragment();
 
+		if (savedInstanceState == null) {
+			Log.d(TAG, "init with default forum");
 			// provide default forum
 			HKGForum forum = new HKGForum("吹水台", "BW");
-			getStaticFragment().saveCurrentForum(forum);
-
-			updateTitle();
-
-			showTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
-			loadTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
-		} else {
-			HKGForum forum = getStaticFragment().getCurrentForum();
-			showTopic(forum.mType, getStaticFragment().getCurrentTopicPageNo());
-
-			// restore state
-			StaticFragment sf = getStaticFragment();
-			onTopicLoaded(sf.mType, sf.mPageNo, sf.mThreadList);
-
-			updateTitle();
-
-			// restore thread is loaded
-			HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
-					.findFragmentByTag(FragmentTag.THREAD.toString());
-			if (tf != null) {
-
-				setPageSwitcher(getStaticFragment().mThread);
-				// switchThreadPage(getStaticFragment().mThread);
-			}
+			sf.saveCurrentForum(forum);
 		}
+
+		// HKGForum forum = sf.getCurrentForum();
+		updateTitle();
+		setupFragmentLayout();
+		// ensureFragmentIsReady(forum.mType, sf.getCurrentTopicPageNo());
+
+		// // setup listener
+		// HKGBookmarkFragment f = (HKGBookmarkFragment)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_BOOKMARK.toString());
+		// if (f != null) {
+		// f.setHKGBookmarkListener(this);
+		// showHKGBookmarkFragment(f);
+		// }
+
+		// startLoadTopic(forum.mType, sf.getCurrentTopicPageNo());
+		//
+		// // 1. restore loweset level bookmark/ topic fragment
+		// // if ("BM".equals(forum.mType)) {
+		// // // restore bookmark
+		// // onHKGForumSelected(forum);
+		// // } else {
+		// // onTopicLoaded(sf.mType, sf.mPageNo, sf.mThreadList);
+		// // }
+		//
+		// onHKGForumSelected(forum);
+		//
+		// 2. restore thread if it has been opened
+		// HKGThreadFragment tf = (HKGThreadFragment)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+		// if (tf != null) {
+		// showHKGThreadFragment(tf);
+		// setPageSwitcher(getStaticFragment().mThread);
+		// // switchThreadPage(getStaticFragment().mThread);
+		// }
 
 	}
 
+	public void onStart() {
+		super.onStart();
+
+		// restore thread fragment
+		HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+		if (tf != null) {
+			setPageSwitcher(getStaticFragment().mThread);
+		}
+
+		// StaticFragment sf = getStaticFragment();
+		// HKGForum forum = sf.getCurrentForum();
+		//
+		// int currentPageNo = sf.getCurrentTopicPageNo();
+		// if (currentPageNo == sf.mPageNo) {
+		// // this page has been loaded
+		// } else {
+		// startLoadTopic(forum.mType, sf.getCurrentTopicPageNo());
+		// }
+		//
+		// // 1. restore loweset level bookmark/ topic fragment
+		// if ("BM".equals(forum.mType)) {
+		// // restore bookmark
+		// HKGBookmarkFragment f = (HKGBookmarkFragment)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_BOOKMARK.toString());
+		// // if (f == null) {
+		// // f = HKGBookmarkFragment.newInstance(forum.mType, 1);
+		// // }
+		// // f.setHKGBookmarkListener(this);
+		// // showHKGBookmarkFragment(f);
+		// } else {
+		// onTopicLoaded(sf.mType, sf.mPageNo, sf.mThreadList);
+		// }
+		//
+		// // 2. restore thread if it has been opened
+		// HKGThreadFragment tf = (HKGThreadFragment)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+		// if (tf != null) {
+		// setPageSwitcher(getStaticFragment().mThread);
+		// }
+	}
+
 	protected StaticFragment getStaticFragment() {
-		return (StaticFragment) getSupportFragmentManager().findFragmentByTag(
-				FragmentTag.STATIC.toString());
+		StaticFragment f = (StaticFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.STATIC.toString());
+		if (f == null) {
+			f = new StaticFragment();
+			getSupportFragmentManager().beginTransaction()
+					.add(f, FragmentTag.STATIC.toString()).commit();
+			getSupportFragmentManager().executePendingTransactions();
+		}
+		return f;
 	}
 
 	@Override
@@ -100,7 +161,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// itemPosition + 1);
 		// }
 		HKGThread thread = getStaticFragment().mThread;
-		loadThread(thread, newPage);
+		startLoadThread(thread, newPage);
 		setSwitchThreadPageAdapter(thread.mTitle, thread.mPageCount,
 				itemPosition);
 
@@ -109,13 +170,13 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 	void switchThreadPage(HKGThread thread) {
 		HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.THREAD.toString());
+				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
 		tf.onThreadLoaded(thread);
 	}
 
-	void showTopic(final String type, final int pageNo) {
+	void ensureFragmentIsReady(final String type, final int pageNo) {
 		HKGTopicFragment2 cf = (HKGTopicFragment2) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.TOPIC.toString());
+				.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
 		if (cf != null) {
 			((HKGTopicFragment2) cf).setHKGThreadListener(this);
 			return;
@@ -124,17 +185,67 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// display UI for thread list
 		HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
 		f.setHKGThreadListener(this);
-
-		FragmentTransaction ft = this.getSupportFragmentManager()
-				.beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
-
-		ft.replace(R.id.container, f, FragmentTag.TOPIC.toString());
-		ft.commit();
+		showHKGTopicFragment(f);
 	}
 
-	void loadTopic(final String type, final int pageNo) {
+	void setupFragmentLayout() {
+		// final String type;
+		// final int pageNo = 1;
+		// HKGTopicFragment2 cf = (HKGTopicFragment2)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+		// if (cf != null) {
+		// ((HKGTopicFragment2) cf).setHKGThreadListener(this);
+		// return;
+		// }
+		//
+		// // display UI for thread list
+		// HKGTopicFragment2 f = HKGTopicFragment2.newInstance(type, pageNo);
+		// f.setHKGThreadListener(this);
+		// showHKGTopicFragment(f);
+
+		StaticFragment sf = getStaticFragment();
+
+		// 1. setup topic/bookmark fragment
+		HKGForum forum = sf.getCurrentForum();
+		if ("BM".equals(forum.mType)) {
+			HKGBookmarkFragment f = (HKGBookmarkFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_BOOKMARK.toString());
+			if (f == null) {
+				f = HKGBookmarkFragment.newInstance(forum.mType, 1);
+				showHKGBookmarkFragment(f);
+			}
+			f.setHKGBookmarkListener(this);
+
+		} else {
+			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+			if (f == null) {
+				f = HKGTopicFragment2.newInstance(forum.mType, 1);
+				showHKGTopicFragment(f);
+
+			}
+			f.setHKGThreadListener(this);
+
+		}
+
+		// 2. setup thread fragment
+		// HKGThreadFragment tf = (HKGThreadFragment)
+		// getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+		// if (tf != null) {
+		// showHKGThreadFragment(tf);
+		// }
+	}
+
+	/**
+	 * staring point of loading topic from current forum. will make network
+	 * call.
+	 * 
+	 * @param type
+	 * @param pageNo
+	 */
+	void startLoadTopic(final String type, final int pageNo) {
 		// load content
 		new Thread() {
 			public void run() {
@@ -150,7 +261,13 @@ public class MainActivity extends SlidingActionBarActivity implements
 				Toast.LENGTH_SHORT).show();
 	}
 
-	void loadThread(final HKGThread thread, final int pageNo) {
+	/**
+	 * starting point of loading thread content. will make network call.
+	 * 
+	 * @param thread
+	 * @param pageNo
+	 */
+	void startLoadThread(final HKGThread thread, final int pageNo) {
 		Log.d(TAG, String.format("loadThread pageNo[%d]", pageNo));
 		new Thread() {
 			public void run() {
@@ -180,14 +297,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		if (thread.mPageCount > 0) {
 			// display UI
 			HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);
-			FragmentTransaction ft = getSupportFragmentManager()
-					.beginTransaction();
-			ft.setCustomAnimations(R.anim.slide_in_left,
-					R.anim.slide_out_right, R.anim.slide_in_left,
-					R.anim.slide_out_right);
-			ft.add(R.id.container, f, FragmentTag.THREAD.toString());
-			ft.addToBackStack(null);
-			ft.commit();
+			showHKGThreadFragment(f);
 
 			// loadThread(thread, 1);
 			getStaticFragment().saveThread(thread);
@@ -200,63 +310,100 @@ public class MainActivity extends SlidingActionBarActivity implements
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuItem refresh = menu.add("Refresh");
-		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+	public boolean onHKGThreadRefreshClicked(MenuItem item) {
+		if (getStaticFragment().mThread == null) {
+			// showTopic("BW", 1);
+			int newPageNo = 1;
+			getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+			// loadTopic("BW", newPageNo);
+			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+			if (f != null) {
+				HKGForum forum = getStaticFragment().getCurrentForum();
+				Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+						forum.mType, 1);
+				f.refreshTopic(bundle);
 
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				if (getStaticFragment().mThread == null) {
-					clearTopicList();
-
-					// showTopic("BW", 1);
-					int newPageNo = 1;
-					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
-					// loadTopic("BW", newPageNo);
-					HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
-							.findFragmentByTag(FragmentTag.TOPIC.toString());
-					if (f != null) {
-						HKGForum forum = getStaticFragment().getCurrentForum();
-						Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
-								forum.mType, 1);
-						f.refreshTopic(bundle);
-
-						updateTitle();
-					}
-				}
-				return true;
+				updateTitle();
 			}
-		});
-
-		MenuItem more = menu.add("More");
-		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				clearTopicList();
-
-				HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
-						.findFragmentByTag(FragmentTag.TOPIC.toString());
-				if (f != null) {
-					int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
-					getStaticFragment().saveCurrentTopicPageNo(newPageNo);
-					// loadTopic("BW", newPageNo);
-					HKGForum forum = getStaticFragment().getCurrentForum();
-					Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
-							forum.mType, newPageNo);
-					f.refreshTopic(bundle);
-
-					updateTitle();
-				}
-
-				return true;
-			}
-		});
+		}
 		return true;
+	}
+
+	@Override
+	public boolean onHKGThreadMoreClicked(MenuItem item) {
+		HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+		if (f != null) {
+			int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
+			getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+			// loadTopic("BW", newPageNo);
+			HKGForum forum = getStaticFragment().getCurrentForum();
+			Bundle bundle = HKGTopicFragment2.getShowTopicBundle(forum.mType,
+					newPageNo);
+			f.refreshTopic(bundle);
+
+			updateTitle();
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return true;
+		// MenuItem refresh = menu.add("Refresh");
+		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+		// | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		// refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		//
+		// @Override
+		// public boolean onMenuItemClick(MenuItem item) {
+		// if (getStaticFragment().mThread == null) {
+		// // showTopic("BW", 1);
+		// int newPageNo = 1;
+		// getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+		// // loadTopic("BW", newPageNo);
+		// HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+		// if (f != null) {
+		// HKGForum forum = getStaticFragment().getCurrentForum();
+		// Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+		// forum.mType, 1);
+		// f.refreshTopic(bundle);
+		//
+		// updateTitle();
+		// }
+		// }
+		// return true;
+		// }
+		// });
+		//
+		// MenuItem more = menu.add("More");
+		// more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+		// | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		// more.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		//
+		// @Override
+		// public boolean onMenuItemClick(MenuItem item) {
+		// HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+		// .findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+		// if (f != null) {
+		// int newPageNo = getStaticFragment().getCurrentTopicPageNo() + 1;
+		// getStaticFragment().saveCurrentTopicPageNo(newPageNo);
+		// // loadTopic("BW", newPageNo);
+		// HKGForum forum = getStaticFragment().getCurrentForum();
+		// Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+		// forum.mType, newPageNo);
+		// f.refreshTopic(bundle);
+		//
+		// updateTitle();
+		// }
+		//
+		// return true;
+		// }
+		// });
+		// return true;
 	}
 
 	public void onBackPressed() {
@@ -285,12 +432,12 @@ public class MainActivity extends SlidingActionBarActivity implements
 			ArrayList<HKGThread> threadList) {
 		Log.d(TAG, String.format("onTopicLoaded pageNo[%d]", pageNo));
 
-		if (threadList.size() > 0) {
+		if (threadList != null && threadList.size() > 0) {
 			// save it so later we can resue it
 			getStaticFragment().saveTopic(type, pageNo, threadList);
 
 			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
-					.findFragmentByTag(FragmentTag.TOPIC.toString());
+					.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
 			if (f != null) {
 				// f.onTopicLoaded(type, pageNo, threadList);
 			}
@@ -313,18 +460,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 		getStaticFragment().saveThread(thread);
 
 		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.THREAD.toString());
-		if (f != null) {
-			f.onThreadLoaded(thread);
-		}
-	}
-
-	private void clearTopicList() {
-		HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.TOPIC.toString());
-		if (f != null) {
-			// f.clear();
-		}
+				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+		f.onThreadLoaded(thread);
 	}
 
 	public static class StaticFragment extends Fragment {
@@ -386,7 +523,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// UI work
 		// 1. remove thread fragment if any
 		HKGThreadFragment tf = (HKGThreadFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.THREAD.toString());
+				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
 		if (tf != null) {
 			getSupportFragmentManager().popBackStackImmediate();
 			// reset actionbar list adpater
@@ -401,21 +538,78 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 		int newPageNo = 1;
 		getStaticFragment().saveCurrentTopicPageNo(newPageNo);
-		HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.TOPIC.toString());
-		if (f != null) {
-			Bundle bundle = HKGTopicFragment2
-					.getShowTopicBundle(forum.mType, 1);
-			f.refreshTopic(bundle);
+
+		// show forum on right fragment
+		if ("BM".equals(forum.mType)) {
+			HKGBookmarkFragment f = (HKGBookmarkFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_BOOKMARK.toString());
+			if (f == null) {
+				f = HKGBookmarkFragment.newInstance(forum.mType, 1);
+				f.setHKGBookmarkListener(this);
+			}
+			showHKGBookmarkFragment(f);
+
+		} else {
+			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_TOPIC.toString());
+			if (f == null) {
+				f = HKGTopicFragment2.newInstance(forum.mType, 1);
+				f.setHKGThreadListener(this);
+
+				showHKGTopicFragment(f);
+			} else {
+				Bundle bundle = HKGTopicFragment2.getShowTopicBundle(
+						forum.mType, 1);
+				f.refreshTopic(bundle);
+			}
+
 		}
 
 		updateTitle();
 	}
 
+	/**
+	 * update actionbar title to display current forum & page no
+	 */
 	public void updateTitle() {
 		String appName = getResources().getString(R.string.app_name);
 		HKGForum forum = getStaticFragment().getCurrentForum();
 		this.setTitle(String.format("%s@%s - %d", appName, forum.mName,
 				getStaticFragment().getCurrentTopicPageNo()));
 	}
+
+	private void showHKGThreadFragment(HKGThreadFragment f) {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+				R.anim.slide_in_left, R.anim.slide_out_right);
+		ft.replace(R.id.container, f, FragmentTag.HKG_THREAD.toString());
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	private void showHKGTopicFragment(HKGTopicFragment2 f) {
+		FragmentTransaction ft = this.getSupportFragmentManager()
+				.beginTransaction();
+		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+				R.anim.slide_in_left, R.anim.slide_out_right);
+
+		ft.replace(R.id.container, f, FragmentTag.HKG_TOPIC.toString());
+		ft.commit();
+	}
+
+	private void showHKGBookmarkFragment(HKGBookmarkFragment f) {
+		FragmentTransaction ft = this.getSupportFragmentManager()
+				.beginTransaction();
+		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+				R.anim.slide_in_left, R.anim.slide_out_right);
+
+		ft.replace(R.id.container, f, FragmentTag.HKG_BOOKMARK.toString());
+		ft.commit();
+	}
+
+	@Override
+	public void onHKGBookmarkSelected(HKGBookmark bookmark) {
+		onHKGThreadSelected(bookmark);
+	}
+
 }

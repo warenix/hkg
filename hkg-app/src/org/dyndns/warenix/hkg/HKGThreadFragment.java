@@ -8,8 +8,11 @@ import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
+import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
+import android.content.ContentValues;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,10 +21,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	WebView mWebView;
@@ -34,7 +40,6 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	static final String mLoadingHtml = "Loading... Please wait";
 	static final String mEmptyHtml = "Cannot open thread.";
-
 
 	/**
 	 * Currently displayed thread
@@ -72,13 +77,12 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	public static HKGThreadFragment newInstance(HKGThread thread, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
-
 		f.mThread = thread;
 		return f;
 	}
 
 	public HKGThreadFragment() {
-		setHasOptionsMenu(true);
+		// setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -99,6 +103,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		setHasOptionsMenu(true);
 	}
 
 	public void setWebViewContent(String content) {
@@ -162,9 +167,50 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
-		// MenuItem refresh = menu.add("Save");
-		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-		// | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		MenuItem bookmark = menu.add("Bookmark");
+		bookmark.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		bookmark.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Toast.makeText(
+						getActivity(),
+						String.format("bookmark "
+								+ HKGThreadFragment.this.mThread.mThreadId),
+						Toast.LENGTH_SHORT).show();
+
+				// save bookmark
+				new Thread() {
+					public void run() {
+						HKGThread thread = HKGThreadFragment.this.mThread;
+
+						ContentValues values = new ContentValues();
+						values.put(HKGMetaData.BookmarkColumns.threadId,
+								thread.mThreadId);
+						values.put(HKGMetaData.BookmarkColumns.title,
+								thread.mTitle);
+						values.put(HKGMetaData.BookmarkColumns.user,
+								thread.mUser);
+						values.put(HKGMetaData.BookmarkColumns.rating,
+								thread.mRating);
+						values.put(HKGMetaData.BookmarkColumns.pageCount,
+								thread.mPageCount);
+						values.put(HKGMetaData.BookmarkColumns.repliesCount,
+								thread.mRepliesCount);
+						values.put(
+								HKGMetaData.BookmarkColumns.last_page_no_seen,
+								thread.mSelectedPage);
+
+						Uri uri = HKGMetaData.getUriListBookmark();
+						Uri insertUri = getActivity().getContentResolver()
+								.insert(uri, values);
+						Log.d(TAG, "inserted uri:" + insertUri);
+					}
+				}.start();
+				return true;
+			}
+		});
 	}
 
 	/**

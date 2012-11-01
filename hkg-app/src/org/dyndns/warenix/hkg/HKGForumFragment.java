@@ -49,9 +49,18 @@ public class HKGForumFragment extends ListFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+	}
+
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		getLoaderManager().initLoader(FORUM_LIST_LOADER, getArguments(), this);
 		mAdapter = new ForumCursorAdapter(getActivity(), null);
 		setListAdapter(mAdapter);
+	}
+
+	public void onStart() {
+		super.onStart();
+
 	}
 
 	public void refreshTopic(Bundle bundle) {
@@ -69,8 +78,13 @@ public class HKGForumFragment extends ListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		setListShown(true);
 		mAdapter.swapCursor(cursor);
+
+		if (isResumed()) {
+			setListShown(true);
+		} else {
+			setListShownNoAnimation(true);
+		}
 	}
 
 	@Override
@@ -100,6 +114,7 @@ public class HKGForumFragment extends ListFragment implements
 		@Override
 		public Object getItem(int position) {
 			Cursor cursor = getCursor();
+			cursor.moveToPosition(position);
 			return createHKGForumFromCursor(cursor);
 		}
 

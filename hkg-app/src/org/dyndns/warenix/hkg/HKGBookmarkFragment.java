@@ -1,6 +1,7 @@
 package org.dyndns.warenix.hkg;
 
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
+import org.dyndns.warenix.ui.utils.SwipeDismissListViewTouchListener;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -25,8 +26,9 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class HKGTopicFragment2 extends SherlockListFragment implements
+public class HKGBookmarkFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String TAG = "HKGBookmarkFragment";
 
 	private static final int TOPIC_LIST_LOADER = 0x01;
 
@@ -34,7 +36,9 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	public static final String BUNDLE_PAGE_NO = "page_no";
 
 	CursorAdapter mAdapter;
-	HKGThreadListener mListener;
+	HKGBookmarkListener mListener;
+
+	private boolean mEnableEditListItem;
 
 	/**
 	 * Create a new instance and load topics from given parameters
@@ -45,10 +49,11 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	 *            page no, 1 based.
 	 * @return
 	 */
-	public static HKGTopicFragment2 newInstance(String type, int pageNo) {
-		HKGTopicFragment2 f = new HKGTopicFragment2();
+	public static HKGBookmarkFragment newInstance(String type, int pageNo) {
+		HKGBookmarkFragment f = new HKGBookmarkFragment();
 		Bundle bundle = getShowTopicBundle(type, pageNo);
 		f.setArguments(bundle);
+		f.setHasOptionsMenu(true);
 		return f;
 	}
 
@@ -72,7 +77,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Log.i("FragmentList", "Item clicked: " + id);
 		if (mListener != null) {
-			mListener.onHKGThreadSelected((HKGThread) mAdapter
+			mListener.onHKGBookmarkSelected((HKGBookmark) mAdapter
 					.getItem(position));
 		}
 	}
@@ -86,38 +91,39 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		setListAdapter(mAdapter);
 	}
 
-	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
 		getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
+
 		setHasOptionsMenu(true);
+
+		mEnableEditListItem = false;
+		enableSwipeToDelete(mEnableEditListItem);
+
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		MenuItem refresh = menu.add("Refresh");
-		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+		Log.d(TAG, String.format("onCreateOptionMenu"));
+
+		MenuItem bookmark = menu.add("Edit");
+		bookmark.setTitle(mEnableEditListItem ? "Done" : "Edit");
+		bookmark.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		bookmark.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				return mListener.onHKGThreadRefreshClicked(item);
+				mEnableEditListItem = !mEnableEditListItem;
+				enableSwipeToDelete(mEnableEditListItem);
+				// update label
+				item.setTitle(mEnableEditListItem ? "Done" : "Edit");
+				return true;
 			}
 		});
 
-		MenuItem more = menu.add("More");
-		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				return mListener.onHKGThreadMoreClicked(item);
-			}
-		});
 	}
 
 	public void refreshTopic(Bundle bundle) {
@@ -130,7 +136,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		if (bundle != null) {
 			String forum = bundle.getString(BUNDLE_FORUM);
 			int pageNo = bundle.getInt(BUNDLE_PAGE_NO);
-			Uri uri = HKGMetaData.getListForumThreadByPage(forum, pageNo);
+			Uri uri = HKGMetaData.getUriListBookmark();
 			CursorLoader cursorLoader = new CursorLoader(getActivity(), uri,
 					null, null, null, null);
 			return cursorLoader;
@@ -147,6 +153,61 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+
+	void enableSwipeToDelete(boolean enable) {
+		ListView listView = getListView();
+
+		SwipeDismissListViewTouchListener touchListener = null;
+
+		if (enable) {
+			// Create a ListView-specific touch listener. ListViews are given
+			// special treatment because
+			// by default they handle touches for their list items... i.e.
+			// they're
+			// in charge of drawing
+			// the pressed state (the list selector), handling list item clicks,
+			// etc.
+			touchListener = new SwipeDismissListViewTouchListener(listView,
+					new SwipeDismissListViewTouchListener.OnDismissCallback() {
+						@Override
+						public void onDismiss(ListView listView,
+								int[] reverseSortedPositions) {
+
+							for (int position : reverseSortedPositions) {
+
+								HKGBookmark bookmark = (HKGBookmark) mAdapter
+										.getItem(position);
+								Log.d(TAG,
+										String.format(
+												"onDismiss position[%d] rowId[%d] threadId[%s]",
+												position, bookmark.mRowId,
+												bookmark.mThreadId));
+
+								// remove bookmark
+								// mAdapter.remove(mAdapter.getItem(position));
+								Uri uri = HKGMetaData
+										.getUriShowBookmarkById(bookmark.mRowId);
+								getActivity().getContentResolver().delete(uri,
+										null, null);
+							}
+							// mAdapter.notifyDataSetChanged();
+
+							// do not hide list to prevent ui blinking
+							getLoaderManager().restartLoader(TOPIC_LIST_LOADER,
+									getArguments(), HKGBookmarkFragment.this);
+						}
+					});
+
+			listView.setOnTouchListener(touchListener);
+			// Setting this scroll listener is required to ensure that during
+			// ListView scrolling,
+			// we don't look for swipes.
+			listView.setOnScrollListener(touchListener.makeScrollListener());
+		} else {
+			listView.setOnTouchListener(null);
+		}
+
 	}
 
 	static class TopicCursorAdapter extends CursorAdapter {
@@ -171,6 +232,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		@Override
 		public Object getItem(int position) {
 			Cursor cursor = getCursor();
+			cursor.moveToPosition(position);
 			return createHKGTopicFromCursor(cursor);
 		}
 
@@ -190,12 +252,11 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 			viewHolder.line2.setText(String.format("%s \u2764 %d\t\t[%s]",
 					topic.mUser, topic.mRating, topic.mThreadId));
 			viewHolder.left.setText(String.format("%d", topic.mRepliesCount));
-
 		}
 
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			View row;
+			View row = null;
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			row = inflater.inflate(R.layout.thread_header, null);
@@ -204,37 +265,41 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 			viewHolder.line1 = (TextView) row.findViewById(R.id.line1);
 			viewHolder.line2 = (TextView) row.findViewById(R.id.line2);
 			row.setTag(viewHolder);
+
 			return row;
 		}
 
 		static HKGThread createHKGTopicFromCursor(Cursor cursor) {
+			long rowId = cursor.getInt(cursor
+					.getColumnIndex(HKGMetaData.BookmarkColumns.ID));
 			String threadId = cursor.getString(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.ID));
+					.getColumnIndex(HKGMetaData.BookmarkColumns.threadId));
 			String user = cursor.getString(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.user));
+					.getColumnIndex(HKGMetaData.BookmarkColumns.user));
 			int repliesCount = cursor.getInt(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.repliesCount));
+					.getColumnIndex(HKGMetaData.BookmarkColumns.repliesCount));
 			String title = cursor.getString(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.title));
+					.getColumnIndex(HKGMetaData.BookmarkColumns.title));
 			int rating = cursor.getInt(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.rating));
+					.getColumnIndex(HKGMetaData.BookmarkColumns.rating));
 			int pageCount = cursor.getInt(cursor
-					.getColumnIndex(HKGMetaData.BaseColumns.pageCount));
-			HKGThread topic = new HKGThread(threadId, user, repliesCount,
-					title, rating, pageCount);
+					.getColumnIndex(HKGMetaData.BookmarkColumns.pageCount));
+			int selectedPage = cursor
+					.getInt(cursor
+							.getColumnIndex(HKGMetaData.BookmarkColumns.last_page_no_seen));
+			HKGBookmark topic = new HKGBookmark(rowId, threadId, user,
+					repliesCount, title, rating, pageCount);
+			topic.mSelectedPage = selectedPage;
 			return topic;
 		}
 	};
 
-	public void setHKGThreadListener(HKGThreadListener listener) {
+	public void setHKGBookmarkListener(HKGBookmarkListener listener) {
 		mListener = listener;
 	}
 
-	interface HKGThreadListener {
-		public void onHKGThreadSelected(HKGThread topic);
-
-		public boolean onHKGThreadRefreshClicked(MenuItem item);
-
-		public boolean onHKGThreadMoreClicked(MenuItem item);
+	interface HKGBookmarkListener {
+		public void onHKGBookmarkSelected(HKGBookmark bookmark);
 	}
+
 }
