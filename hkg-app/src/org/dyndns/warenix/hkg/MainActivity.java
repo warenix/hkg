@@ -6,6 +6,7 @@ import org.dyndns.warenix.abs.activity.SlidingActionBarActivity;
 import org.dyndns.warenix.hkg.HKGBookmarkFragment.HKGBookmarkListener;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGForumFragment.HKGForumListener;
+import org.dyndns.warenix.hkg.HKGSearchFragment.HKGSearchResultListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGForum;
 import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
 
@@ -17,9 +18,12 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 
 public class MainActivity extends SlidingActionBarActivity implements
-		HKGListener, HKGThreadListener, HKGForumListener, HKGBookmarkListener {
+		HKGListener, HKGThreadListener, HKGForumListener, HKGBookmarkListener,
+		HKGSearchResultListener {
 
 	public MainActivity() {
 		super(R.string.app_name);
@@ -28,8 +32,10 @@ public class MainActivity extends SlidingActionBarActivity implements
 	static final String TAG = "HKGMain";
 
 	enum FragmentTag {
-		STATIC, HKG_TOPIC, HKG_THREAD, HKG_BOOKMARK
+		STATIC, HKG_TOPIC, HKG_THREAD, HKG_BOOKMARK, HKG_SEARCH
 	}
+
+	private String mDefaultTimeFilter = "m";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +100,9 @@ public class MainActivity extends SlidingActionBarActivity implements
 				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
 		if (tf != null) {
 			setPageSwitcher(getStaticFragment().mThread);
+		}
+		if (getStaticFragment().getSearchQuery() != null) {
+			startNewSearch();
 		}
 
 		// StaticFragment sf = getStaticFragment();
@@ -216,6 +225,14 @@ public class MainActivity extends SlidingActionBarActivity implements
 				showHKGBookmarkFragment(f);
 			}
 			f.setHKGBookmarkListener(this);
+		} else if ("WS".equals(forum.mType)) {
+			HKGSearchFragment f = (HKGSearchFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_SEARCH.toString());
+			if (f == null) {
+				f = HKGSearchFragment.newInstance(getStaticFragment()
+						.getSearchQuery(), 0, mDefaultTimeFilter);
+				showHKGSearchFragment(f);
+			}
 
 		} else {
 			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
@@ -351,6 +368,33 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		SearchView searchView = new SearchView(getSupportActionBar()
+				.getThemedContext());
+		searchView.setQueryHint("Search for threads");
+		final MenuItem searchMenuItem = menu.add(Menu.NONE, Menu.NONE, 99,
+				"Search");
+		searchMenuItem.setActionView(searchView).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM
+						| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+
+		searchView.setOnQueryTextListener(new OnQueryTextListener() {
+
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				Log.d(TAG, String.format("query[%s]", query));
+				searchMenuItem.collapseActionView();
+				getStaticFragment().saveSearchQuery(query);
+
+				startNewSearch();
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				return true;
+			}
+		});
+
 		return true;
 		// MenuItem refresh = menu.add("Refresh");
 		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
@@ -479,6 +523,12 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// topic pageNo
 		int mCurrentTopicPage = 1;
 
+		/**
+		 * search query obtained from SearchView widge. Will be passed to
+		 * HKGSearchFragment
+		 */
+		private String mSearchQuery;
+
 		public StaticFragment() {
 			setRetainInstance(true);
 		}
@@ -508,6 +558,14 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 		public HKGForum getCurrentForum() {
 			return mForum;
+		}
+
+		public void saveSearchQuery(String query) {
+			mSearchQuery = query;
+		}
+
+		public String getSearchQuery() {
+			return mSearchQuery;
 		}
 	}
 
@@ -548,6 +606,14 @@ public class MainActivity extends SlidingActionBarActivity implements
 				f.setHKGBookmarkListener(this);
 			}
 			showHKGBookmarkFragment(f);
+		} else if ("WS".equals(forum.mType)) {
+			HKGSearchFragment f = (HKGSearchFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_SEARCH.toString());
+			if (f == null) {
+				f = HKGSearchFragment.newInstance(getStaticFragment()
+						.getSearchQuery(), 0, mDefaultTimeFilter);
+			}
+			showHKGSearchFragment(f);
 
 		} else {
 			HKGTopicFragment2 f = (HKGTopicFragment2) getSupportFragmentManager()
@@ -575,6 +641,17 @@ public class MainActivity extends SlidingActionBarActivity implements
 		String appName = getResources().getString(R.string.app_name);
 		HKGForum forum = getStaticFragment().getCurrentForum();
 		this.setTitle(String.format("%s@%s - %d", appName, forum.mName,
+				getStaticFragment().getCurrentTopicPageNo()));
+	}
+
+	/**
+	 * update actionbar title to display current forum & page no
+	 */
+	public void updateTitleAsSearch() {
+		String appName = getResources().getString(R.string.app_name);
+		HKGForum forum = getStaticFragment().getCurrentForum();
+		String query = getStaticFragment().getSearchQuery();
+		this.setTitle(String.format("%s@%s - %d", appName, query,
 				getStaticFragment().getCurrentTopicPageNo()));
 	}
 
@@ -607,9 +684,39 @@ public class MainActivity extends SlidingActionBarActivity implements
 		ft.commit();
 	}
 
+	private void showHKGSearchFragment(HKGSearchFragment f) {
+		FragmentTransaction ft = this.getSupportFragmentManager()
+				.beginTransaction();
+		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+				R.anim.slide_in_left, R.anim.slide_out_right);
+
+		ft.replace(R.id.container, f, FragmentTag.HKG_SEARCH.toString());
+		ft.commit();
+	}
+
+	/**
+	 * display search fragment for search result
+	 */
+	void startNewSearch() {
+		String query = getStaticFragment().getSearchQuery();
+		if (query != null && query.length() > 0) {
+			HKGSearchFragment f = (HKGSearchFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_SEARCH.toString());
+			f = HKGSearchFragment.newInstance(query, 0, mDefaultTimeFilter);
+			showHKGSearchFragment(f);
+
+			updateTitleAsSearch();
+		}
+	}
+
 	@Override
 	public void onHKGBookmarkSelected(HKGBookmark bookmark) {
 		onHKGThreadSelected(bookmark);
+	}
+
+	@Override
+	public void onHKGSearchResultSelected(HKGSearchResult searchResult) {
+		onHKGThreadSelected(searchResult);
 	}
 
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dyndns.warenix.google.search.GoogleWebSearchMaster;
+import org.dyndns.warenix.google.search.GoogleWebSearchMaster.WebSearchResult;
 import org.dyndns.warenix.hkg.HKGThread;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
@@ -49,6 +51,10 @@ public class HKGProvider extends ContentProvider {
 		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
 				HKGMetaData.PATH_SHOW_BOOKMARK_BY_ID,
 				HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID);
+
+		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
+				HKGMetaData.PATH_LIST_SEARCH_RESULT_BY_PAGE,
+				HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE);
 	}
 
 	// database
@@ -148,6 +154,9 @@ public class HKGProvider extends ContentProvider {
 		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
 			return HKGMetaData.CONTENT_TYPE_HKG_BOOKMARK_ONE;
 
+		case HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE:
+			return HKGMetaData.CONTENT_TYPE_HKG_SEARCH_RESULT_LIST;
+
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
@@ -202,6 +211,10 @@ public class HKGProvider extends ContentProvider {
 		case HKGMetaData.TYPE_LIST_BOOKMARK:
 		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
 			return queryAllHKGBookmark(uri, projection, selection,
+					selectionArgs, sortOrder);
+
+		case HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE:
+			return queryAllHKGSearchResult(uri, projection, selection,
 					selectionArgs, sortOrder);
 		}
 		return null;
@@ -324,6 +337,34 @@ public class HKGProvider extends ContentProvider {
 
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
+	}
+
+	private Cursor queryAllHKGSearchResult(Uri uri, String[] projection,
+			String selection, String[] selectionArgs, String sortOrder) {
+
+		List<String> pathSegments = uri.getPathSegments();
+		String query = pathSegments.get(1);
+		int pageNo = Integer.parseInt(pathSegments.get(2));
+		String timeFilter = pathSegments.get(3);
+
+		WebSearchResult result = GoogleWebSearchMaster.doSearch(
+				String.format("%s site:m.hkgolden.com", query), pageNo,
+				timeFilter);
+
+		// MatrixCursor cursor = new MatrixCursor(new String[] { "result" });
+		// cursor.addRow(new Object[] { result });
+
+		MatrixCursor cursor = new MatrixCursor(
+				HKGMetaData.MATRIX_SEARCH_RESULT_BY_PAGE_CURSOR_COLUMNS);
+		long count = 0;
+		if (result != null) {
+			for (GoogleWebSearchMaster.Page page : result.mPageList) {
+				cursor.addRow(new Object[] { ++count, page.url, page.title,
+						page.content, result.currentPageIndex,
+						result.resultCount });
+			}
+		}
+		return cursor;
 	}
 
 	@Override

@@ -1,5 +1,8 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar" />
+    <style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:colorBackground">@android:color/black</item>
+    </style>
 
 </resources>

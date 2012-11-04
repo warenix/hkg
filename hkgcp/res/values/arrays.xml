@@ -3,6 +3,7 @@
 
     <array name="forum_name_array">
         <item>賣飛彿</item>
+        <item>搜尋</item>
         <item>吹水台</item>
         <item>創意台</item>
         <item>自組活動台</item>
@@ -32,6 +33,7 @@
     </array>
     <array name="forum_type_array">
         <item>BM</item>
+        <item>WS</item>
         <item>BW</item>
         <item>EP</item>
         <item>AC</item>
