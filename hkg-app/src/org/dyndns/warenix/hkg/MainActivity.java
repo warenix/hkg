@@ -10,6 +10,7 @@ import org.dyndns.warenix.hkg.HKGSearchFragment.HKGSearchResultListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGForum;
 import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -100,6 +101,22 @@ public class MainActivity extends SlidingActionBarActivity implements
 				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
 		if (tf != null) {
 			setPageSwitcher(getStaticFragment().mThread);
+		} else {
+			Uri data = getIntent().getData();
+			if (data != null) {
+				String threadId = HKGMaster.extraceThreadIdFromURL(data
+						.toString());
+				if (threadId != null) {
+					String user = null;
+					int repliesCount = 0;
+					String title = null;
+					int rating = 0;
+					int pageCount = 1;
+					HKGThread thread = new HKGThread(threadId, user,
+							repliesCount, title, rating, pageCount);
+					onHKGThreadSelected(thread);
+				}
+			}
 		}
 		if (getStaticFragment().getSearchQuery() != null) {
 			startNewSearch();
@@ -502,6 +519,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 				thread.mSelectedPage));
 		// save it so later we can resue it
 		getStaticFragment().saveThread(thread);
+		setPageSwitcher(thread);
 
 		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());

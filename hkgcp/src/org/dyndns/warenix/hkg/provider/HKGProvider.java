@@ -347,17 +347,19 @@ public class HKGProvider extends ContentProvider {
 		int pageNo = Integer.parseInt(pathSegments.get(2));
 		String timeFilter = pathSegments.get(3);
 
-		WebSearchResult result = GoogleWebSearchMaster.doSearch(
-				String.format("%s site:m.hkgolden.com", query), pageNo,
-				timeFilter);
-
-		// MatrixCursor cursor = new MatrixCursor(new String[] { "result" });
-		// cursor.addRow(new Object[] { result });
-
 		MatrixCursor cursor = new MatrixCursor(
 				HKGMetaData.MATRIX_SEARCH_RESULT_BY_PAGE_CURSOR_COLUMNS);
+		WebSearchResult result = null;
 		long count = 0;
-		if (result != null) {
+
+		while (count <= 24) {
+			result = GoogleWebSearchMaster.doSearch(
+					String.format("%s site:m.hkgolden.com", query), pageNo,
+					timeFilter);
+			if (result == null) {
+				break;
+			}
+
 			for (GoogleWebSearchMaster.Page page : result.mPageList) {
 				cursor.addRow(new Object[] { ++count, page.url, page.title,
 						page.content, result.currentPageIndex,
