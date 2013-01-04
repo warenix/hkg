@@ -65,7 +65,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	final String mCssViewQuote = ".ViewQuote {border-left: 1px solid;"
 			+ "margin: 0.1em 0;" + "padding: 0.1em 10px;"
 			+ "line-height: 1.45;" + "position: relative;"
-			+ "border-bottom: 2px solid;" + "border-left: 1px solid;" + "}";
+			+ "border-bottom: 2px solid;" + "border-left: 1px solid;" + "font-family: syncopate, serif;"+"}";
+	// + "img {max-width:100%;}";
 
 	final String mCss = mCssViewQuote + mCssColorTheme;
 
@@ -94,6 +95,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			mWebView = (WebView) view.findViewById(R.id.webView1);
 			mWebView.getSettings().setDefaultTextEncodingName("utf-8");
 			mWebView.getSettings().setBuiltInZoomControls(true);
+			mWebView.getSettings().setUseWideViewPort(true);
 			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 			mWebView.setBackgroundColor(Color.BLACK);
 			setWebViewContent(mLoadingHtml);
@@ -108,7 +110,10 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	public void setWebViewContent(String content) {
 		StringBuffer s = new StringBuffer();
-		s.append("<html><style type=\"text/css\">");
+		s.append("<html>");
+		s.append("<script src=\"http://use.edgefonts.net/syncopate.js\"></script>");
+		// s.append("<head><meta name=\"viewport\" content=\"width=device-width\" /></head>");
+		s.append("<style type=\"text/css\">");
 		s.append(mCss);
 		s.append("</style>");
 		s.append("<div id=\"hkgcontent\">");

@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class SimpleProviderTestCase2 extends ProviderTestCase2<HKGProvider> {
 
-	private static final String TAG = "MyProviderTestCase2";
+	private static final String TAG = "SimpleProviderTestCase2";
 
 	public SimpleProviderTestCase2() {
 		super(HKGProvider.class, HKGProvider.class.getName());
@@ -57,30 +57,30 @@ public class SimpleProviderTestCase2 extends ProviderTestCase2<HKGProvider> {
 	// }
 	// }
 
-//	public void testQueryHKGThreadByPage() {
-//		ContentProvider provider = getProvider();
-//
-//		Uri uri = Uri.parse("content://" + HKGMetaData.AUTHORITY
-//				+ "/thread/4037502/1");
-//
-//		Cursor cursor = provider.query(uri, null, null, null, null);
-//
-//		assertNotNull("can't resolve uri:" + uri, cursor);
-//		Log.d(TAG, "rows count:" + cursor.getCount());
-//		assertTrue("at least 1 reply count. get " + cursor.getCount(),
-//				cursor.getCount() > 0);
-//		try {
-//			cursor = provider.query(uri, null, null, null, null);
-//			while (cursor.moveToNext()) {
-//				for (int i = 0; i < cursor.getColumnCount(); ++i) {
-//					Log.d(TAG, i + "->" + cursor.getColumnName(i) + ":"
-//							+ cursor.getString(i));
-//				}
-//			}
-//		} catch (IllegalArgumentException e) {
-//			assertTrue(false);
-//		}
-//	}
+	// public void testQueryHKGThreadByPage() {
+	// ContentProvider provider = getProvider();
+	//
+	// Uri uri = Uri.parse("content://" + HKGMetaData.AUTHORITY
+	// + "/thread/4037502/1");
+	//
+	// Cursor cursor = provider.query(uri, null, null, null, null);
+	//
+	// assertNotNull("can't resolve uri:" + uri, cursor);
+	// Log.d(TAG, "rows count:" + cursor.getCount());
+	// assertTrue("at least 1 reply count. get " + cursor.getCount(),
+	// cursor.getCount() > 0);
+	// try {
+	// cursor = provider.query(uri, null, null, null, null);
+	// while (cursor.moveToNext()) {
+	// for (int i = 0; i < cursor.getColumnCount(); ++i) {
+	// Log.d(TAG, i + "->" + cursor.getColumnName(i) + ":"
+	// + cursor.getString(i));
+	// }
+	// }
+	// } catch (IllegalArgumentException e) {
+	// assertTrue(false);
+	// }
+	// }
 
 	public void testHKGForum() {
 		ContentProvider provider = getProvider();

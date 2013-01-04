@@ -90,7 +90,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		getListView().setCacheColorHint(Color.BLACK);
+//		getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
 		setHasOptionsMenu(true);
 	}
