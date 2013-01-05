@@ -102,10 +102,11 @@ public class MainActivity extends SlidingActionBarActivity implements
 		if (tf != null) {
 			setPageSwitcher(getStaticFragment().mThread);
 		} else {
-			Uri data = getIntent().getData();
+			final Uri data = getIntent().getData();
 			if (data != null) {
-				String threadId = HKGMaster.extraceThreadIdFromURL(data
-						.toString());
+				final String url = data.toString();
+				String threadId = HKGMaster.extraceThreadIdFromURL(url);
+				int pageNo = HKGMaster.extracePageNoFromURL(url);
 				if (threadId != null) {
 					String user = null;
 					int repliesCount = 0;
@@ -114,6 +115,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 					int pageCount = 1;
 					HKGThread thread = new HKGThread(threadId, user,
 							repliesCount, title, rating, pageCount);
+					thread.mSelectedPage = pageNo;
 					onHKGThreadSelected(thread);
 				}
 			}
@@ -658,8 +660,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 	public void updateTitle() {
 		String appName = getResources().getString(R.string.app_name);
 		HKGForum forum = getStaticFragment().getCurrentForum();
-		this.setTitle(String.format("%s@%s - %d", appName, forum.mName,
-				getStaticFragment().getCurrentTopicPageNo()));
+		this.setTitle(String.format("%s - %d @%s", forum.mName,
+				getStaticFragment().getCurrentTopicPageNo(), appName));
 	}
 
 	/**
@@ -669,8 +671,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 		String appName = getResources().getString(R.string.app_name);
 		HKGForum forum = getStaticFragment().getCurrentForum();
 		String query = getStaticFragment().getSearchQuery();
-		this.setTitle(String.format("%s@%s - %d", appName, query,
-				getStaticFragment().getCurrentTopicPageNo()));
+		this.setTitle(String.format("%s - %d @%s", query, getStaticFragment()
+				.getCurrentTopicPageNo(), appName));
 	}
 
 	private void showHKGThreadFragment(HKGThreadFragment f) {

@@ -21,10 +21,32 @@ public class HKGMaster {
 			uri = Uri.parse(URLDecoder.decode(urlString, "UTF-8"));
 			return uri.getQueryParameter("message");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	/**
+	 * extract thread id from given url
+	 * 
+	 * @param urlString
+	 *            example:
+	 *            http://m.hkgolden.com/view.aspx?message=<threadId>&type=BW
+	 * @return null if the message id is not found.
+	 */
+	public static int extracePageNoFromURL(String urlString) {
+		Uri uri;
+		try {
+			uri = Uri.parse(URLDecoder.decode(urlString, "UTF-8"));
+			final String pageNo = uri.getQueryParameter("page");
+			if (pageNo != null) {
+				return Integer.parseInt(pageNo);
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		return 1;
 	}
 }

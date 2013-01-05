@@ -9,15 +9,18 @@ package org.dyndns.warenix.hkg;
 
 public final class R {
     public static final class anim {
-        public static final int slide_in_left=0x7f040000;
-        public static final int slide_out_right=0x7f040001;
+        public static final int object_animator=0x7f040000;
+        public static final int slide_in_left=0x7f040001;
+        public static final int slide_out_right=0x7f040002;
     }
     public static final class array {
-        public static final int entries_list_preference=0x7f050002;
-        public static final int entryvalues_list_preference=0x7f050003;
-        public static final int forum_name_array=0x7f050000;
-        public static final int forum_type_array=0x7f050001;
-        public static final int locations=0x7f050004;
+        public static final int entries_list_preference=0x7f050004;
+        public static final int entryvalues_list_preference=0x7f050005;
+        public static final int forum_name_array=0x7f050002;
+        public static final int forum_type_array=0x7f050003;
+        public static final int google_translate_locale_list_name=0x7f050000;
+        public static final int google_translate_locale_list_value=0x7f050001;
+        public static final int locations=0x7f050006;
     }
     public static final class attr {
         /**  Custom divider drawable to use for elements in the action bar. 
@@ -1044,6 +1047,7 @@ containing a value of this type.
         public static final int ic_launcher=0x7f020071;
         public static final int rectangle=0x7f020072;
         public static final int shadow=0x7f020073;
+        public static final int window_background=0x7f020074;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f080025;
@@ -1154,14 +1158,15 @@ containing a value of this type.
         public static final int list=0x7f03001b;
         public static final int list_navigation=0x7f03001c;
         public static final int menu_frame=0x7f03001d;
-        public static final int shadow=0x7f03001e;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001f;
-        public static final int sherlock_spinner_item=0x7f030020;
-        public static final int slidingmenumain=0x7f030021;
-        public static final int slidingmenumainlist=0x7f030022;
-        public static final int slidingmenurow=0x7f030023;
-        public static final int switch_page_dropdown=0x7f030024;
-        public static final int thread_header=0x7f030025;
+        public static final int search_result_header=0x7f03001e;
+        public static final int shadow=0x7f03001f;
+        public static final int sherlock_spinner_dropdown_item=0x7f030020;
+        public static final int sherlock_spinner_item=0x7f030021;
+        public static final int slidingmenumain=0x7f030022;
+        public static final int slidingmenumainlist=0x7f030023;
+        public static final int slidingmenurow=0x7f030024;
+        public static final int switch_page_dropdown=0x7f030025;
+        public static final int thread_header=0x7f030026;
     }
     public static final class menu {
         public static final int activity_main=0x7f0d0000;
@@ -1218,6 +1223,42 @@ containing a value of this type.
         public static final int title_activity_main=0x7f060003;
     }
     public static final class style {
+        /** 
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
+
+
+
+
+    
+
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
+
+
+
+
+    
+
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
+
+
+
+
+    
+         */
+        public static final int AppBaseTheme=0x7f07005a;
+        /**  Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+ Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+ Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+         */
         public static final int AppTheme=0x7f070000;
         public static final int DialogWindowTitle_Sherlock=0x7f070037;
         public static final int DialogWindowTitle_Sherlock_Light=0x7f070038;
@@ -2332,7 +2373,7 @@ containing a value of this type.
          */
         public static final int[] SherlockSpinner = {
             0x010100af, 0x01010175, 0x01010176, 0x0101017b,
-            0x01010262, 0x010102ac, 0x010102ad, 0x010103fd
+            0x01010262, 0x010102ac, 0x010102ad, 0x01010411
         };
         /**
           <p>

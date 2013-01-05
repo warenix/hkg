@@ -11,6 +11,7 @@ import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -65,7 +66,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	final String mCssViewQuote = ".ViewQuote {border-left: 1px solid;"
 			+ "margin: 0.1em 0;" + "padding: 0.1em 10px;"
 			+ "line-height: 1.45;" + "position: relative;"
-			+ "border-bottom: 2px solid;" + "border-left: 1px solid;" + "font-family: syncopate, serif;"+"}";
+			+ "border-bottom: 2px solid;" + "border-left: 1px solid;"
+			+ "font-family: syncopate, serif;" + "}";
 	// + "img {max-width:100%;}";
 
 	final String mCss = mCssViewQuote + mCssColorTheme;
@@ -214,6 +216,24 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 					}
 				}.start();
 				return true;
+			}
+		});
+		MenuItem share = menu.add("Share");
+		share.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		share.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Intent i = new Intent(Intent.ACTION_SEND);
+				i.setType("text/plain");
+				i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+				i.putExtra(Intent.EXTRA_TEXT, String.format(
+						"http://m.hkgolden.com/view.aspx?message=%s&page=%s",
+						mThread.mThreadId, mThread.mSelectedPage));
+				startActivity(Intent.createChooser(i, "Share URL"));
+				return true;
+
 			}
 		});
 	}

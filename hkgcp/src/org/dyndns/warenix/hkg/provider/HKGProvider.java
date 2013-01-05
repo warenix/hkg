@@ -352,15 +352,18 @@ public class HKGProvider extends ContentProvider {
 		WebSearchResult result = null;
 		long count = 0;
 
+		// search next page to get more result
 		while (count <= 24) {
 			result = GoogleWebSearchMaster.doSearch(
-					String.format("%s site:m.hkgolden.com", query), pageNo,
+					String.format("%s site:m.hkgolden.com", query), pageNo++,
 					timeFilter);
-			if (result == null) {
+			if (result == null || result.mPageList.size() == 0) {
 				break;
 			}
 
 			for (GoogleWebSearchMaster.Page page : result.mPageList) {
+				// modify title XXXX - 香港高登 to XXXX
+				page.title = page.title.replace(" - 香港高登", "");
 				cursor.addRow(new Object[] { ++count, page.url, page.title,
 						page.content, result.currentPageIndex,
 						result.resultCount });
