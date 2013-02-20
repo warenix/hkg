@@ -62,7 +62,7 @@ public class HKGListParser extends HKGParser {
 			case FIND_TOPIC_TITLE:
 				if (!("         <div>".equals(inputLine) || "         </div>"
 						.equals(inputLine))) {
-					mThread.mTitle = inputLine.replace(" ", "").replace(
+					mThread.mTitle = inputLine.trim().replace(
 							"&nbsp;&nbsp;-&nbsp;", "");
 					mCurrentStep = Step.FIND_TOPIC_USER;
 				}
@@ -70,7 +70,7 @@ public class HKGListParser extends HKGParser {
 			case FIND_TOPIC_USER:
 				Matcher m = mThreadUserPattern.matcher(inputLine);
 				if (m.find()) {
-					mThread.mUser = m.group(1).replace(" ", "")
+					mThread.mUser = m.group(1).trim()
 							.replace("&nbsp;&nbsp;-&nbsp;", "");
 					mThread.mRating = Integer.parseInt(m.group(2));
 					mCurrentStep = Step.FIND_TOPIC_PAGE_COUNT;
