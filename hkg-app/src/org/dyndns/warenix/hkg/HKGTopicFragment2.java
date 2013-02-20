@@ -36,6 +36,11 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	CursorAdapter mAdapter;
 	HKGThreadListener mListener;
 
+	/*
+	 * the scroll list view item to top will be performed after loader finished.
+	 */
+	private boolean mPendingScrollListViewItemToTop = false;
+
 	/**
 	 * Create a new instance and load topics from given parameters
 	 * 
@@ -90,7 +95,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-//		getListView().setCacheColorHint(Color.BLACK);
+		// getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
 		setHasOptionsMenu(true);
 	}
@@ -121,6 +126,8 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	}
 
 	public void refreshTopic(Bundle bundle) {
+		mPendingScrollListViewItemToTop = true;
+
 		setListShown(false);
 		getLoaderManager().restartLoader(TOPIC_LIST_LOADER, bundle, this);
 	}
@@ -142,6 +149,10 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		setListShown(true);
 		mAdapter.swapCursor(cursor);
+		if (mPendingScrollListViewItemToTop) {
+			mPendingScrollListViewItemToTop = false;
+			getListView().setSelectionAfterHeaderView();
+		}
 	}
 
 	@Override
