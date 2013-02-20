@@ -161,6 +161,8 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	}
 
 	static class TopicCursorAdapter extends CursorAdapter {
+		private static LayoutInflater sInflater = null;
+
 		public TopicCursorAdapter(Context context, Cursor c) {
 			super(context, c);
 		}
@@ -207,9 +209,11 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			View row;
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			row = inflater.inflate(R.layout.thread_header, null);
+			if (sInflater == null) {
+				sInflater = (LayoutInflater) context
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			}
+			row = sInflater.inflate(R.layout.thread_header, null);
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.left = (TextView) row.findViewById(R.id.left);
 			viewHolder.line1 = (TextView) row.findViewById(R.id.line1);
