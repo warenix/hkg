@@ -108,6 +108,7 @@ public class HKGThread {
 		public void setContent(String contentHtml) {
 			contentHtml = replaceWithRealImage(contentHtml);
 			contentHtml = replaceRelativeImage(contentHtml);
+			contentHtml = replaceDoubleSlashImage(contentHtml);
 
 			mContent = contentHtml;
 		}
@@ -134,6 +135,10 @@ public class HKGThread {
 			String src = null;
 			while (srcMatcher.find()) {
 				src = srcMatcher.group(1);
+				// handle this kind of tag [img]//j.mp/9TnTW1[/img]
+				if (src.startsWith("//")) {
+					src = "http:" + src;
+				}
 				if (src.charAt(0) == '/' && !relativeImgList.contains(src)) {
 					relativeImgList.add(src);
 				}
@@ -142,6 +147,20 @@ public class HKGThread {
 			for (String relatievImg : relativeImgList) {
 				contentHtml = contentHtml.replace(relatievImg, domain
 						+ relatievImg);
+			}
+
+			return contentHtml;
+		}
+
+		String replaceDoubleSlashImage(String contentHtml) {
+			Matcher srcMatcher = HKGParser.mImgPattern.matcher(contentHtml);
+			String src = null;
+			while (srcMatcher.find()) {
+				src = srcMatcher.group(1);
+				// handle this kind of tag [img]//j.mp/9TnTW1[/img]
+				if (src.startsWith("//")) {
+					contentHtml = contentHtml.replace(src, "http:" + src);
+				}
 			}
 
 			return contentHtml;
