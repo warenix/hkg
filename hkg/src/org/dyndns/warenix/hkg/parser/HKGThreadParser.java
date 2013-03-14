@@ -60,7 +60,9 @@ public class HKGThreadParser extends HKGParser {
 						if (mThread == null) {
 							mThread = new HKGThread();
 						}
-						mThread.mTitle = matcher.group(1);
+
+						mThread.mTitle = matcher.group(1)
+								.replace(" - 香港高登", "");
 						mCurrentStep = Step.FIND_THREAD_PAGE_COUNT;
 					}
 				}

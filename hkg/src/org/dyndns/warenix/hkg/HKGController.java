@@ -29,27 +29,40 @@ public class HKGController {
 		}
 	}
 
+	/**
+	 * Read a thread by page.
+	 * 
+	 * @param thread
+	 * @param pageNo
+	 *            1 based.
+	 */
 	public void readThreadByPage(HKGThread thread, int pageNo) {
-		// HKGPage cachedPage = thread.mPageMap.get(pageNo);
-		HKGPage cachedPage = thread.getPage(pageNo);
-		boolean hasNoCache = cachedPage == null;
+		boolean mayHaveNewReply = true;
 
-		boolean mayHaveNewReplyInThisPage = !hasNoCache
-				&& cachedPage.getReplyList().size() < HKGPage.MAX_REPLIES_PER_PAGE;
-		boolean mayHaveNewReplyInNewLastPage = !hasNoCache
-				&& thread.mSelectedPage == thread.mPageCount
-				&& cachedPage.getReplyList().size() == HKGPage.MAX_REPLIES_PER_PAGE;
-		boolean mayHaveNewReply = mayHaveNewReplyInThisPage
-				|| mayHaveNewReplyInNewLastPage;
-		// if (hasNoCache || mayHaveNewReply) {
-		try {
-			HKGThreadParser parser = new HKGThreadParser(pageNo);
-			parser.setHKGThread(thread);
-			parser.parse(PageRequest.getReadThreadUrl(thread.mThreadId, pageNo));
-		} catch (IOException e) {
-			e.printStackTrace();
+		HKGPage cachedPage = thread.getPage(pageNo);
+		if (cachedPage != null) {
+			mayHaveNewReply = cachedPage.getReplyList().size() < (pageNo == 1 ? HKGPage.MAX_REPLIES_PER_PAGE + 1
+					: HKGPage.MAX_REPLIES_PER_PAGE);
 		}
-		// }
+
+		if (mayHaveNewReply) {
+			System.out.println("call parser");
+			try {
+				HKGThreadParser parser = new HKGThreadParser(pageNo);
+				parser.setHKGThread(thread);
+				parser.parse(PageRequest.getReadThreadUrl(thread.mThreadId,
+						pageNo));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (pageNo == 1) {
+			thread.updateAuthorIfNeeded();
+		}
+
+		thread.mSelectedPage = pageNo;
+
 		if (mListener != null) {
 			mListener.onThreadLoaded(thread);
 		}

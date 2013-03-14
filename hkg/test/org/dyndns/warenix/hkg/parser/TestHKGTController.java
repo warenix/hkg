@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.dyndns.warenix.hkg.HKGController;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread;
-import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 
 public class TestHKGTController {
 	public static void main(String args[]) {
@@ -13,10 +12,11 @@ public class TestHKGTController {
 		HKGController controller = HKGController.getController();
 		controller.setHKGListener(listener);
 		// controller.readTopicByPage("BW", 1);
-		HKGThread thread = new HKGThread("3997451", null, -1, null, -1, -1);
-		printThread(thread);
-		controller.readThreadByPage(thread, 1);
+		HKGThread thread = new HKGThread("4305635");
 		controller.readThreadByPage(thread, 2);
+		System.out.println(thread.getPage(2).getReplyList().size());
+		controller.readThreadByPage(thread, 2);
+		System.out.println(thread.getPage(2).getReplyList().size());
 
 	}
 
@@ -44,7 +44,7 @@ public class TestHKGTController {
 	}
 
 	static void printThread(HKGThread thread) {
-		System.out.println(String.format("selected:%d pageCount:%d",
-				thread.mSelectedPage, thread.mPageCount));
+		System.out.println(thread);
+		System.out.println();
 	}
 }

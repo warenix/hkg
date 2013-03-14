@@ -8,7 +8,13 @@ import org.dyndns.warenix.hkg.parser.HKGParser;
 
 public class HKGThread {
 	public String mThreadId;
+	/**
+	 * user is only available on topic list
+	 */
 	public String mUser;
+	/**
+	 * replies count is only available on topic list
+	 */
 	public int mRepliesCount;
 	public String mTitle;
 	public int mRating;
@@ -25,6 +31,36 @@ public class HKGThread {
 
 	}
 
+	protected String updateAuthorIfNeeded() {
+		if (mUser == null) {
+			// treat the 1st reply on page 1 as the author
+			HKGPage page = getPage(1);
+			if (page != null) {
+				ArrayList<HKGReply> replyList = page.getReplyList();
+				if (replyList != null && replyList.size() > 0) {
+					HKGReply reply = replyList.get(0);
+					mUser = reply.mUser;
+				}
+			}
+		}
+		return mUser;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"[%s] [%s] by [%s]\n replies[%d] pages[%d] rating[%d]",
+				mThreadId, mTitle, mUser, mRepliesCount, mPageCount, mRating);
+	}
+
+	/**
+	 * 
+	 * @param threadId
+	 */
+	public HKGThread(String threadId) {
+		this(threadId, null, -1, null, -1, -1);
+	}
+
 	public HKGThread(String threadId, String user, int repliesCount,
 			String title, int rating, int pageCount) {
 		mThreadId = threadId;
@@ -39,6 +75,12 @@ public class HKGThread {
 		return mPageMap.get(pageNo);
 	}
 
+	/**
+	 * A page contains a list of replies
+	 * 
+	 * @author warenix
+	 * 
+	 */
 	public static class HKGPage {
 		static final int MAX_REPLIES_PER_PAGE = 25;
 		int mPageNo;
