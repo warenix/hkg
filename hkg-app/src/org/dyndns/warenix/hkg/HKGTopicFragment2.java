@@ -27,7 +27,7 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 public class HKGTopicFragment2 extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
-
+	private static final String TAG = "HKGTopicFragment2";
 	private static final int TOPIC_LIST_LOADER = 0x01;
 
 	public static final String BUNDLE_FORUM = "forum";
@@ -147,6 +147,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		Log.d(TAG, String.format("onLoadFinished"));
 		setListShown(true);
 		mAdapter.swapCursor(cursor);
 		if (mPendingScrollListViewItemToTop) {

@@ -3,11 +3,14 @@ package org.dyndns.warenix.hkg;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
+import org.dyndns.warenix.hkg.parser.HKGParser;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
 import android.content.ContentValues;
@@ -236,6 +239,23 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 			}
 		});
+
+		MenuItem gallery = menu.add("Gallery");
+		gallery.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		gallery.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				HKGPage page = mThread.getPage(mThread.mSelectedPage);
+
+				Intent i = new Intent(getActivity(), ImageDetailActivity.class);
+				i.putExtra(ImageDetailActivity.EXTRA_IMAGE,
+						extractImageFromPage(page));
+				startActivity(i);
+				return true;
+			}
+		});
 	}
 
 	/**
@@ -257,4 +277,37 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		}
 	}
 
+	public static ArrayList<String> extractImageFromPage(HKGPage page) {
+		String imgRegex = "src\\s*=\\s*['\"]([^'\"]+)['\"]";
+		Pattern p = Pattern.compile(imgRegex);
+		Matcher m = null;
+		ArrayList<String> imageList = new ArrayList<String>();
+		for (HKGReply reply : page.getReplyList()) {
+			Matcher srcMatcher = HKGParser.mImgPattern.matcher(reply.mContent);
+			String src = null;
+			while (srcMatcher.find()) {
+				src = srcMatcher.group(1);
+				if (!(src.startsWith("http://m.hkgolden.com/faces/") || imageList
+						.contains(src))) {
+					imageList.add(src);
+				}
+			}
+
+			srcMatcher = HKGParser.mHrefPattern.matcher(reply.mContent);
+			String smallSrc = null;
+			while (srcMatcher.find()) {
+				src = srcMatcher.group(1);
+				Log.d(TAG, String.format("warenix found %s", src));
+				smallSrc = src.toLowerCase();
+				if ((smallSrc.endsWith("jpg") || smallSrc.endsWith("png") || smallSrc
+						.endsWith("gif"))
+						&& !(src.startsWith("http://m.hkgolden.com/faces/") || imageList
+								.contains(src))) {
+					imageList.add(src);
+				}
+			}
+		}
+		Log.d(TAG, "found " + imageList.size());
+		return imageList;
+	}
 }

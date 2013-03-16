@@ -244,6 +244,10 @@ public class HKGBookmarkFragment extends SherlockListFragment implements
 
 			HKGThread topic = createHKGTopicFromCursor(cursor);
 
+			// temp fix when bookmark is not complete...
+			if (topic.mTitle == null) {
+				topic.mTitle = "";
+			}
 			viewHolder.line1.setText(String.format("%s",
 					Html.fromHtml(topic.mTitle)));
 			if (topic.mRating < 0) {
