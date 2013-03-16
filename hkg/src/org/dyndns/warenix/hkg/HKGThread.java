@@ -1,12 +1,13 @@
 package org.dyndns.warenix.hkg;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 
 import org.dyndns.warenix.hkg.parser.HKGParser;
 
-public class HKGThread {
+public class HKGThread implements Serializable {
 	public String mThreadId;
 	/**
 	 * user is only available on topic list
@@ -81,7 +82,7 @@ public class HKGThread {
 	 * @author warenix
 	 * 
 	 */
-	public static class HKGPage {
+	public static class HKGPage implements Serializable {
 		static final int MAX_REPLIES_PER_PAGE = 25;
 		int mPageNo;
 
@@ -100,7 +101,7 @@ public class HKGThread {
 		}
 	}
 
-	public static class HKGReply {
+	public static class HKGReply implements Serializable {
 		public String mUser;
 		public String mPostDate;
 		public String mContent;
@@ -174,7 +175,7 @@ public class HKGThread {
 		}
 	}
 
-	public static class HKGForum {
+	public static class HKGForum implements Serializable {
 		public HKGForum(String name, String type) {
 			mName = name;
 			mType = type;

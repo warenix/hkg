@@ -525,7 +525,9 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
-		f.onThreadLoaded(thread);
+		if (f != null) {
+			f.onThreadLoaded(thread);
+		}
 	}
 
 	public static class StaticFragment extends Fragment {
@@ -551,6 +553,33 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 		public StaticFragment() {
 			setRetainInstance(true);
+		}
+
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+
+			if (savedInstanceState != null) {
+				mForum = (HKGForum) savedInstanceState.get("mForum");
+				mThread = (HKGThread) savedInstanceState.get("mThread");
+				mCurrentTopicPage = savedInstanceState
+						.getInt("mCurrentTopicPage");
+				mType = savedInstanceState.getString("mType");
+				mPageNo = savedInstanceState.getInt("mPageNo");
+				mThreadList = (ArrayList<HKGThread>) savedInstanceState
+						.getSerializable("mThreadList");
+			}
+		}
+
+		@Override
+		public void onSaveInstanceState(Bundle savedInstanceState) {
+			super.onSaveInstanceState(savedInstanceState);
+
+			savedInstanceState.putSerializable("mForum", mForum);
+			savedInstanceState.putSerializable("mThread", mThread);
+			savedInstanceState.putInt("mCurrentTopicPage", mCurrentTopicPage);
+			savedInstanceState.putString("mType", mType);
+			savedInstanceState.putInt("mPageNo", mPageNo);
+			savedInstanceState.putSerializable("mThreadList", mThreadList);
 		}
 
 		public void saveThread(HKGThread thread) {
