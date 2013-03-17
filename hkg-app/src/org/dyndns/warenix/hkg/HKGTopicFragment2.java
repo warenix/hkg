@@ -97,6 +97,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 
 		// getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
+		setEmptyText("Nothing at the moment");
 		setHasOptionsMenu(true);
 	}
 

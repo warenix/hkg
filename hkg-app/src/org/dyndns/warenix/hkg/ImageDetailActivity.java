@@ -82,7 +82,7 @@ public class ImageDetailActivity extends FragmentActivity implements
 
 		// The ImageFetcher takes care of loading images into our ImageView
 		// children asynchronously
-		mImageFetcher = new ImageFetcher(this, longest * 2);
+		mImageFetcher = new ImageFetcher(this, longest);
 		mImageFetcher.addImageCache(getSupportFragmentManager(), cacheParams);
 		mImageFetcher.setImageFadeIn(true);
 		mImageFetcher.setErrorImage(R.drawable.ic_launcher);

@@ -706,8 +706,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 	private void showHKGThreadFragment(HKGThreadFragment f) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
+		// ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+		// R.anim.slide_in_left, R.anim.slide_out_right);
 		ft.replace(R.id.container, f, FragmentTag.HKG_THREAD.toString());
 		ft.addToBackStack(null);
 		ft.commit();
@@ -716,8 +716,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 	private void showHKGTopicFragment(HKGTopicFragment2 f) {
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
+		// ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+		// R.anim.slide_in_left, R.anim.slide_out_right);
 
 		ft.replace(R.id.container, f, FragmentTag.HKG_TOPIC.toString());
 		ft.commit();
@@ -726,8 +726,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 	private void showHKGBookmarkFragment(HKGBookmarkFragment f) {
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
+		// ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+		// R.anim.slide_in_left, R.anim.slide_out_right);
 
 		ft.replace(R.id.container, f, FragmentTag.HKG_BOOKMARK.toString());
 		ft.commit();
@@ -736,8 +736,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 	private void showHKGSearchFragment(HKGSearchFragment f) {
 		FragmentTransaction ft = this.getSupportFragmentManager()
 				.beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
-				R.anim.slide_in_left, R.anim.slide_out_right);
+		// ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+		// R.anim.slide_in_left, R.anim.slide_out_right);
 
 		ft.replace(R.id.container, f, FragmentTag.HKG_SEARCH.toString());
 		ft.commit();
