@@ -59,6 +59,8 @@ public abstract class HKGParser {
 			.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
 	public static final Pattern mRealImgPattern = Pattern
 			.compile("\\[(img|IMG)\\](.*?)\\[/(img|IMG)\\]");
+	public static final Pattern mSrcPattern = Pattern
+			.compile("src\\s*=\\s*['\"]([^'\"]+)['\"]");
 
 	public static final Pattern mTitlePattern = Pattern
 			.compile("<title>(.*?)</title>");
