@@ -321,9 +321,13 @@ public class MainActivity extends SlidingActionBarActivity implements
 	void setPageSwitcher(final HKGThread thread) {
 		this.runOnUiThread(new Runnable() {
 			public void run() {
-				Log.d(TAG, "setPageSwitcher(), update navigation list item");
-				setSwitchThreadPageAdapter(thread.mTitle, thread.mPageCount,
-						thread.mSelectedPage - 1);
+				if (getStaticFragment().mThread != null) {
+					// make sure update the ui when current fragment is the
+					// thread view
+					Log.d(TAG, "setPageSwitcher(), update navigation list item");
+					setSwitchThreadPageAdapter(thread.mTitle,
+							thread.mPageCount, thread.mSelectedPage - 1);
+				}
 			}
 		});
 	}
@@ -524,17 +528,19 @@ public class MainActivity extends SlidingActionBarActivity implements
 	public void onThreadLoaded(HKGThread thread) {
 		Log.d(TAG, String.format("onThreadLoaded selectedPage[%s]",
 				thread.mSelectedPage));
+		if (getStaticFragment().mThread != null) {
+			// make sure update the ui when current fragment is the thread view
+			saveLastUnreadPageNo(thread);
 
-		saveLastUnreadPageNo(thread);
+			// save it so later we can reuse it
+			getStaticFragment().saveThread(thread);
+			setPageSwitcher(thread);
 
-		// save it so later we can reuse it
-		getStaticFragment().saveThread(thread);
-		setPageSwitcher(thread);
-
-		HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
-		if (f != null) {
-			f.onThreadLoaded(thread);
+			HKGThreadFragment f = (HKGThreadFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.HKG_THREAD.toString());
+			if (f != null) {
+				f.onThreadLoaded(thread);
+			}
 		}
 	}
 
