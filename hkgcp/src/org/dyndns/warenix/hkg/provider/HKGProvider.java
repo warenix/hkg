@@ -55,13 +55,17 @@ public class HKGProvider extends ContentProvider {
 		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
 				HKGMetaData.PATH_LIST_SEARCH_RESULT_BY_PAGE,
 				HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE);
+
+		sUriMatcher.addURI(HKGMetaData.AUTHORITY,
+				HKGMetaData.PATH_SHOW_LAST_VISIT_THREAD_PAGE,
+				HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE);
 	}
 
 	// database
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
 		DatabaseHelper(Context context) {
-			super(context, "hkg.db", null, 1);
+			super(context, "hkg.db", null, 2);
 		}
 
 		@Override
@@ -89,15 +93,44 @@ public class HKGProvider extends ContentProvider {
 					+ " NOT NULL DEFAULT CURRENT_TIMESTAMP" + //
 					");");
 
-			db.execSQL("CREATE TRIGGER UPDATE_FOOBAR BEFORE UPDATE ON "
+			db.execSQL("CREATE TRIGGER UPDATE_BOOKMARK BEFORE UPDATE ON "
 					+ "bookmark" + " BEGIN UPDATE " + "bookmark" + " SET "
 					+ HKGMetaData.BookmarkColumns.last_modified
 					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
 
-			db.execSQL("CREATE TRIGGER INSERT_FOOBAR AFTER INSERT ON "
+			db.execSQL("CREATE TRIGGER INSERT_BOOKMARK AFTER INSERT ON "
 					+ "bookmark" + " BEGIN UPDATE " + "bookmark" + " SET "
 					+ HKGMetaData.BookmarkColumns.last_modified
 					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
+
+			db.execSQL("CREATE TABLE "
+					+ "hkthread_last_visit"
+					+ " ("
+					+ HKGMetaData.HKGThreadLastVisitColumns.ID
+					+ " INTEGER PRIMARY KEY AUTOINCREMENT,"//
+					+ HKGMetaData.HKGThreadLastVisitColumns.threadId
+					+ " VARCHAR(255) UNIQUE," //
+					+ HKGMetaData.HKGThreadLastVisitColumns.pageNo
+					+ " INTEGER DEFAULT 1," //
+					+ HKGMetaData.HKGThreadLastVisitColumns.last_modified
+					+ " NOT NULL DEFAULT CURRENT_TIMESTAMP" //
+					+ ");");
+
+			db.execSQL("CREATE TRIGGER UPDATE_LAST_VISIT BEFORE UPDATE ON "
+					+ "hkthread_last_visit" + " BEGIN UPDATE "
+					+ "hkthread_last_visit" + " SET "
+					+ HKGMetaData.HKGThreadLastVisitColumns.last_modified
+					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
+
+			db.execSQL("CREATE TRIGGER INSERT_LAST_VISIT AFTER INSERT ON "
+					+ "hkthread_last_visit" + " BEGIN UPDATE "
+					+ "hkthread_last_visit" + " SET "
+					+ HKGMetaData.HKGThreadLastVisitColumns.last_modified
+					+ " = strftime('%s','now') WHERE rowid = new.rowid; END");
+
+			db.execSQL("CREATE INDEX INDEX_LAST_VISIT ON hkthread_last_visit("
+					+ HKGMetaData.HKGThreadLastVisitColumns.threadId + ")");
+
 		}
 
 		@Override
@@ -105,6 +138,7 @@ public class HKGProvider extends ContentProvider {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + "bookmark");
+			db.execSQL("DROP TABLE IF EXISTS " + "hkthread_last_visit");
 			onCreate(db);
 		}
 	}
@@ -119,20 +153,29 @@ public class HKGProvider extends ContentProvider {
 			where = "";
 		}
 
+		String table = null;
+
 		switch (sUriMatcher.match(uri)) {
 		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			table = "bookmark";
 			break;
 
 		case HKGMetaData.TYPE_SHOW_BOOKMARK_BY_ID:
+			table = "bookmark";
 			where = where + HKGMetaData.BookmarkColumns.ID + "="
 					+ uri.getLastPathSegment();
 			break;
 		}
 
-		SQLiteDatabase db = mDBHelper.getReadableDatabase();
-		int count = db.delete("bookmark", where, whereArgs);
-		getContext().getContentResolver().notifyChange(uri, null);
-		return count;
+		if (table != null) {
+			SQLiteDatabase db = mDBHelper.getReadableDatabase();
+			int count = db.delete(table, where, whereArgs);
+			getContext().getContentResolver().notifyChange(uri, null);
+			return count;
+		} else {
+			// return 0 as no right tablet is picked
+			return 0;
+		}
 	}
 
 	@Override
@@ -157,6 +200,9 @@ public class HKGProvider extends ContentProvider {
 		case HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE:
 			return HKGMetaData.CONTENT_TYPE_HKG_SEARCH_RESULT_LIST;
 
+		case HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE:
+			return HKGMetaData.CONTENT_TYPE_LAST_VISIT_THREAD_PAGE;
+
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
@@ -164,7 +210,21 @@ public class HKGProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
-		if (sUriMatcher.match(uri) != HKGMetaData.TYPE_LIST_BOOKMARK) {
+		String table = null;
+		Uri insertedUri = null;
+
+		switch (sUriMatcher.match(uri)) {
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			table = "bookmark";
+
+			break;
+
+		case HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE:
+			table = "hkthread_last_visit";
+			break;
+		}
+
+		if (table == null) {
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
 
@@ -176,10 +236,10 @@ public class HKGProvider extends ContentProvider {
 		}
 
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		long rowId = db.insert("bookmark", null, values);
+		long rowId = db.insertWithOnConflict(table, null, values,
+				SQLiteDatabase.CONFLICT_REPLACE);
 		if (rowId > 0) {
-
-			Uri insertedUri = HKGMetaData.getUriShowBookmarkById(rowId);
+			insertedUri = HKGMetaData.getUriShowBookmarkById(rowId);
 			getContext().getContentResolver().notifyChange(insertedUri, null);
 			return insertedUri;
 		}
@@ -196,8 +256,10 @@ public class HKGProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		Log.d(TAG, String.format("query() uri[%s]", uri));
-		switch (sUriMatcher.match(uri)) {
+		int uriType = sUriMatcher.match(uri);
+		Log.d(TAG, String.format("query() uri[%s] type[%d]", uri, uriType));
+
+		switch (uriType) {
 		case HKGMetaData.TYPE_LIST_FORUM:
 			return queryAllHKGForum(uri, projection, selection, selectionArgs,
 					sortOrder);
@@ -216,8 +278,12 @@ public class HKGProvider extends ContentProvider {
 		case HKGMetaData.TYPE_LIST_SEARCH_RESULT_BY_PAGE:
 			return queryAllHKGSearchResult(uri, projection, selection,
 					selectionArgs, sortOrder);
+
+		case HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE:
+			return queryOneLastVisitPage(uri, projection, selection,
+					selectionArgs, sortOrder);
 		}
-		return null;
+		throw new IllegalArgumentException("Unknown URI: " + uri);
 	}
 
 	private Cursor queryAllCentralBeauty(Uri uri, String[] projection,
@@ -372,10 +438,63 @@ public class HKGProvider extends ContentProvider {
 		return cursor;
 	}
 
+	// warenix
+	private Cursor queryOneLastVisitPage(Uri uri, String[] projection,
+			String selection, String[] selectionArgs, String sortOrder) {
+		String table = null;
+
+		if (selection == null) {
+			selection = "";
+		}
+
+		switch (sUriMatcher.match(uri)) {
+		case HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE:
+			table = "hkthread_last_visit";
+			List<String> pathSegments = uri.getPathSegments();
+			String threadId = pathSegments.get(1);
+			int pageNo = Integer.parseInt(pathSegments.get(2));
+
+			selection = selection
+					+ HKGMetaData.HKGThreadLastVisitColumns.threadId + "="
+					+ threadId;
+			break;
+
+		}
+
+		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		qb.setTables(table);
+		SQLiteDatabase db = mDBHelper.getReadableDatabase();
+		Cursor c = qb.query(db, projection, selection, selectionArgs, null,
+				null, sortOrder);
+
+		c.setNotificationUri(getContext().getContentResolver(), uri);
+		return c;
+	}
+
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		return 0;
+
+		String table = null;
+
+		switch (sUriMatcher.match(uri)) {
+		case HKGMetaData.TYPE_LIST_BOOKMARK:
+			table = "bookmark";
+			break;
+
+		case HKGMetaData.TYPE_SHOW_LAST_VISIT_THREAD_PAGE:
+			table = "hkthread_last_visit";
+			break;
+		}
+
+		if (table == null) {
+			throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+
+		SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		int rows = db.update(table, values, selection, selectionArgs);
+
+		return rows;
 	}
 
 }

@@ -9,7 +9,10 @@ import org.dyndns.warenix.hkg.HKGForumFragment.HKGForumListener;
 import org.dyndns.warenix.hkg.HKGSearchFragment.HKGSearchResultListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGForum;
 import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
+import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -307,7 +310,6 @@ public class MainActivity extends SlidingActionBarActivity implements
 		Log.d(TAG, String.format("loadThread pageNo[%d]", pageNo));
 		new Thread() {
 			public void run() {
-				Log.d(TAG, String.format("Network call, readThreadByPage()"));
 				HKGController mController = new HKGController();
 				mController.setHKGListener(MainActivity.this);
 				mController.readThreadByPage(thread, pageNo);
@@ -331,8 +333,11 @@ public class MainActivity extends SlidingActionBarActivity implements
 		Log.d(TAG, String.format("showing thread %s", thread.mThreadId));
 
 		if (thread.mPageCount > 0) {
+			int lastUnreadPageNo = getLastUnreadPageNo(thread);
+			thread.mSelectedPage = lastUnreadPageNo;
 			// display UI
-			HKGThreadFragment f = HKGThreadFragment.newInstance(thread, 1);
+			HKGThreadFragment f = HKGThreadFragment.newInstance(thread,
+					lastUnreadPageNo);
 			showHKGThreadFragment(f);
 
 			// loadThread(thread, 1);
@@ -519,7 +524,10 @@ public class MainActivity extends SlidingActionBarActivity implements
 	public void onThreadLoaded(HKGThread thread) {
 		Log.d(TAG, String.format("onThreadLoaded selectedPage[%s]",
 				thread.mSelectedPage));
-		// save it so later we can resue it
+
+		saveLastUnreadPageNo(thread);
+
+		// save it so later we can reuse it
 		getStaticFragment().saveThread(thread);
 		setPageSwitcher(thread);
 
@@ -766,6 +774,51 @@ public class MainActivity extends SlidingActionBarActivity implements
 	@Override
 	public void onHKGSearchResultSelected(HKGSearchResult searchResult) {
 		onHKGThreadSelected(searchResult);
+	}
+
+	/**
+	 * Find the last unread page no for a particular thread
+	 * 
+	 * @param thread
+	 * @return the last unread page no. default is the selected page.
+	 */
+	private int getLastUnreadPageNo(HKGThread thread) {
+		int lastUnreadPageNo = thread.mSelectedPage;
+		Uri uri = HKGMetaData
+				.getUriShowLastVisitThreadPage(thread.mThreadId, 0);
+		Cursor cursor = getApplication().getContentResolver().query(uri, null,
+				null, null, null);
+		if (cursor != null && cursor.moveToNext()) {
+			lastUnreadPageNo = cursor
+					.getInt(cursor
+							.getColumnIndex(HKGMetaData.HKGThreadLastVisitColumns.pageNo));
+		}
+		return lastUnreadPageNo;
+	}
+
+	/**
+	 * Save the selected page no of the thread as last unread
+	 * 
+	 * @param thread
+	 */
+	private void saveLastUnreadPageNo(HKGThread thread) {
+		Uri uri = HKGMetaData
+				.getUriShowLastVisitThreadPage(thread.mThreadId, 0);
+
+		ContentValues values = new ContentValues();
+		values.put(HKGMetaData.HKGThreadLastVisitColumns.threadId,
+				thread.mThreadId);
+		values.put(HKGMetaData.HKGThreadLastVisitColumns.pageNo,
+				thread.mSelectedPage);
+
+		Cursor c = getContentResolver().query(uri, null, null, null, null);
+		if (c == null) {
+			Uri insertUri = getContentResolver().insert(uri, values);
+			Log.d(TAG, "inserted uri:" + insertUri);
+		} else {
+			int rows = getContentResolver().update(uri, values, null, null);
+			Log.d(TAG, "updated rows:" + rows);
+		}
 	}
 
 }
