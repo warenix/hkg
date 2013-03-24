@@ -398,9 +398,9 @@ public class MainActivity extends SlidingActionBarActivity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		SearchView searchView = new SearchView(getSupportActionBar()
 				.getThemedContext());
-		searchView.setQueryHint("Search for threads");
+		searchView.setQueryHint(getString(R.string.search_view_hints));
 		final MenuItem searchMenuItem = menu.add(Menu.NONE, Menu.NONE, 99,
-				"Search");
+				getString(R.string.menu_search));
 		searchMenuItem.setActionView(searchView).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM
 						| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
@@ -424,7 +424,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 		});
 
 		final MenuItem gotoMenu = menu.add(Menu.NONE, R.id.goto_menu, 10,
-				"GoTo");
+				getString(R.string.menu_goto));
 		gotoMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 

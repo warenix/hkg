@@ -57,7 +57,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			// HKGPage page = mThread.mPageMap.get(mThread.mSelectedPage);
 			HKGPage page = mThread.getPage(mThread.mSelectedPage);
 			if (page == null) {
-				setWebViewContent(mEmptyHtml);
+				setWebViewContent(getString(R.string.thread_loading_error));
 			} else {
 				setWebViewContent(formatHKGPageToHTML(page));
 			}
@@ -103,7 +103,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			mWebView.getSettings().setUseWideViewPort(true);
 			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 			mWebView.setBackgroundColor(Color.BLACK);
-			setWebViewContent(mLoadingHtml);
+			setWebViewContent(getString(R.string.thread_loading_start));
 		}
 		return view;
 	}
@@ -177,7 +177,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
-		MenuItem bookmark = menu.add("Bookmark");
+		MenuItem bookmark = menu.add(getString(R.string.menu_bookmark));
 		bookmark.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		bookmark.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -186,7 +186,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			public boolean onMenuItemClick(MenuItem item) {
 				Toast.makeText(
 						getActivity(),
-						String.format("bookmark "
+						String.format(getString(R.string.bookmark_saved)
 								+ HKGThreadFragment.this.mThread.mThreadId),
 						Toast.LENGTH_SHORT).show();
 
@@ -221,7 +221,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				return true;
 			}
 		});
-		MenuItem share = menu.add("Share");
+		MenuItem share = menu.add(getString(R.string.menu_share));
 		share.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		share.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -240,7 +240,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			}
 		});
 
-		MenuItem gallery = menu.add("Gallery");
+		MenuItem gallery = menu.add(getString(R.string.menu_gallery));
 		gallery.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		gallery.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -248,11 +248,14 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				HKGPage page = mThread.getPage(mThread.mSelectedPage);
+				ArrayList<String> imageList = extractImageFromPage(page);
+				if (imageList != null) {
+					Intent i = new Intent(getActivity(),
+							ImageDetailActivity.class);
 
-				Intent i = new Intent(getActivity(), ImageDetailActivity.class);
-				i.putExtra(ImageDetailActivity.EXTRA_IMAGE,
-						extractImageFromPage(page));
-				startActivity(i);
+					i.putExtra(ImageDetailActivity.EXTRA_IMAGE, imageList);
+					startActivity(i);
+				}
 				return true;
 			}
 		});
@@ -278,6 +281,9 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	}
 
 	public static ArrayList<String> extractImageFromPage(HKGPage page) {
+		if (page == null || page.getReplyList() == null) {
+			return null;
+		}
 		String imgRegex = "src\\s*=\\s*['\"]([^'\"]+)['\"]";
 		Pattern p = Pattern.compile(imgRegex);
 		Matcher m = null;

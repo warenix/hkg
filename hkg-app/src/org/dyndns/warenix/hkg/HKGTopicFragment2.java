@@ -97,13 +97,13 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 
 		// getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
-		setEmptyText("Nothing at the moment");
+		setEmptyText(getString(R.string.topic_loading_error));
 		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		MenuItem refresh = menu.add("Refresh");
+		MenuItem refresh = menu.add(getString(R.string.menu_refresh));
 		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -114,7 +114,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 			}
 		});
 
-		MenuItem more = menu.add("More");
+		MenuItem more = menu.add(getString(R.string.menu_more));
 		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {

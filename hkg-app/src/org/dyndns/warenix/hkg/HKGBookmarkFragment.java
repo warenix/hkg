@@ -96,7 +96,7 @@ public class HKGBookmarkFragment extends SherlockListFragment implements
 
 		getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
-
+		setEmptyText(getString(R.string.bookmark_list_empty));
 		setHasOptionsMenu(true);
 
 		mEnableEditListItem = false;
@@ -109,7 +109,8 @@ public class HKGBookmarkFragment extends SherlockListFragment implements
 		Log.d(TAG, String.format("onCreateOptionMenu"));
 
 		MenuItem bookmark = menu.add("Edit");
-		bookmark.setTitle(mEnableEditListItem ? "Done" : "Edit");
+		bookmark.setTitle(mEnableEditListItem ? getString(R.string.menu_done)
+				: getString(R.string.menu_edit));
 		bookmark.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		bookmark.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -119,7 +120,8 @@ public class HKGBookmarkFragment extends SherlockListFragment implements
 				mEnableEditListItem = !mEnableEditListItem;
 				enableSwipeToDelete(mEnableEditListItem);
 				// update label
-				item.setTitle(mEnableEditListItem ? "Done" : "Edit");
+				item.setTitle(mEnableEditListItem ? getString(R.string.menu_done)
+						: getString(R.string.menu_edit));
 				return true;
 			}
 		});

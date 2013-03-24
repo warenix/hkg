@@ -101,7 +101,7 @@ public class HKGSearchFragment extends SherlockListFragment implements
 
 		getListView().setCacheColorHint(Color.BLACK);
 		setListShown(false);
-
+		setEmptyText(getString(R.string.search_result_list_empty));
 		setHasOptionsMenu(true);
 
 		mEnableEditListItem = false;
