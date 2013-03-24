@@ -18,25 +18,25 @@ package org.dyndns.warenix.hkg;
 
 import java.util.ArrayList;
 
+import org.dyndns.warenix.abs.activity.SimpleABSActionbarActivity;
+
 import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.example.android.bitmapfun.util.ImageCache;
 import com.example.android.bitmapfun.util.ImageFetcher;
 
-public class ImageDetailActivity extends FragmentActivity implements
+public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		OnClickListener {
 	private static final String TAG = "ImageDetailActivity";
 
@@ -54,6 +54,9 @@ public class ImageDetailActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.image_detail_pager);
+
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Fetch screen height and width, to use as our max size when loading
 		// images as this
@@ -163,7 +166,7 @@ public class ImageDetailActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			NavUtils.navigateUpFromSameTask(this);
+			this.onBackPressed();
 			return true;
 			/*
 			 * case R.id.clear_cache: mImageFetcher.clearCache();
