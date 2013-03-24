@@ -2,7 +2,7 @@
     package="org.dyndns.warenix.hkg"
     android:installLocation="auto"
     android:versionCode="8"
-    android:versionName="1.7" >
+    android:versionName="1.8" >
 
     <uses-sdk
         android:minSdkVersion="8"
