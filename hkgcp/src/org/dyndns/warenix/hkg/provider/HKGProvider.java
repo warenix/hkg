@@ -492,7 +492,9 @@ public class HKGProvider extends ContentProvider {
 		}
 
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		int rows = db.update(table, values, selection, selectionArgs);
+		// int rows = db.update(table, values, selection, selectionArgs);
+		int rows = db.updateWithOnConflict(table, values, selection,
+				selectionArgs, SQLiteDatabase.CONFLICT_REPLACE);
 
 		return rows;
 	}
