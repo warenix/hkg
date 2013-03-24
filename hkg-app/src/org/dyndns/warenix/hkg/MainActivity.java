@@ -11,13 +11,20 @@ import org.dyndns.warenix.hkg.HKGThread.HKGForum;
 import org.dyndns.warenix.hkg.HKGTopicFragment2.HKGThreadListener;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
@@ -111,15 +118,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 				String threadId = HKGMaster.extraceThreadIdFromURL(url);
 				int pageNo = HKGMaster.extracePageNoFromURL(url);
 				if (threadId != null) {
-					String user = null;
-					int repliesCount = 0;
-					String title = null;
-					int rating = 0;
-					int pageCount = 1;
-					HKGThread thread = new HKGThread(threadId, user,
-							repliesCount, title, rating, pageCount);
-					thread.mSelectedPage = pageNo;
-					onHKGThreadSelected(thread);
+					showThreadById(threadId, pageNo);
 				}
 			}
 		}
@@ -167,7 +166,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 		if (f == null) {
 			f = new StaticFragment();
 			getSupportFragmentManager().beginTransaction()
-					.add(f, FragmentTag.STATIC.toString()).commit();
+					.add(f, FragmentTag.STATIC.toString())
+					.commitAllowingStateLoss();
 			getSupportFragmentManager().executePendingTransactions();
 		}
 		return f;
@@ -423,6 +423,11 @@ public class MainActivity extends SlidingActionBarActivity implements
 			}
 		});
 
+		final MenuItem gotoMenu = menu.add(Menu.NONE, R.id.goto_menu, 10,
+				"GoTo");
+		gotoMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+
 		return true;
 		// MenuItem refresh = menu.add("Refresh");
 		// refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
@@ -495,8 +500,17 @@ public class MainActivity extends SlidingActionBarActivity implements
 				this.onBackPressed();
 				return true;
 			}
+			break;
+		case R.id.goto_menu:
+			gotoThredById();
+			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void gotoThredById() {
+		QuantityDialogFragment dialog = new QuantityDialogFragment();
+		dialog.show(getSupportFragmentManager(), "Dialog");
 	}
 
 	@Override
@@ -827,4 +841,58 @@ public class MainActivity extends SlidingActionBarActivity implements
 		}
 	}
 
+	public static class QuantityDialogFragment extends DialogFragment implements
+			OnClickListener {
+
+		private EditText editQuantity;
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			editQuantity = new EditText(getActivity());
+			editQuantity.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+			return new AlertDialog.Builder(getActivity())
+					.setTitle(R.string.app_name)
+					.setMessage("Please Enter Thread ID")
+					.setPositiveButton("OK", this)
+					.setNegativeButton("CANCEL", null).setView(editQuantity)
+					.create();
+
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int position) {
+
+			String value = editQuantity.getText().toString();
+			Log.d("Quantity: ", value);
+			MainActivity callingActivity = (MainActivity) getActivity();
+			callingActivity.onUserSelectValue(value);
+			dialog.dismiss();
+		}
+	}
+
+	public void onUserSelectValue(String selectedValue) {
+		Toast.makeText(this, "Goto " + selectedValue, 1000).show();
+		String threadId = selectedValue;
+		int pageNo = 1;
+		showThreadById(threadId, pageNo);
+	}
+
+	/**
+	 * show particular thread
+	 * 
+	 * @param threadId
+	 * @param pageNo
+	 */
+	private void showThreadById(String threadId, int pageNo) {
+		String user = null;
+		int repliesCount = 0;
+		String title = null;
+		int rating = 0;
+		int pageCount = 1;
+		HKGThread thread = new HKGThread(threadId, user, repliesCount, title,
+				rating, pageCount);
+		thread.mSelectedPage = pageNo;
+		onHKGThreadSelected(thread);
+	}
 }
