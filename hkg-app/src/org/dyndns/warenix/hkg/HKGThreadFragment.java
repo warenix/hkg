@@ -116,7 +116,10 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	public void setWebViewContent(String content) {
 		StringBuffer s = new StringBuffer();
 		s.append("<html>");
-		s.append("<script src=\"http://use.edgefonts.net/syncopate.js\"></script>");
+		/*
+		 * s.append(
+		 * "<script src=\"http://use.edgefonts.net/syncopate.js\"></script>");
+		 */
 		// s.append("<head><meta name=\"viewport\" content=\"width=device-width\" /></head>");
 		s.append("<style type=\"text/css\">");
 		s.append(mCss);
@@ -249,12 +252,16 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			public boolean onMenuItemClick(MenuItem item) {
 				HKGPage page = mThread.getPage(mThread.mSelectedPage);
 				ArrayList<String> imageList = extractImageFromPage(page);
-				if (imageList != null) {
+				if (imageList != null && imageList.size() > 0) {
 					Intent i = new Intent(getActivity(),
 							ImageDetailActivity.class);
 
 					i.putExtra(ImageDetailActivity.EXTRA_IMAGE, imageList);
 					startActivity(i);
+				} else {
+					Toast.makeText(getActivity(),
+							getString(R.string.toast_gallery_image_list_empty),
+							Toast.LENGTH_SHORT).show();
 				}
 				return true;
 			}

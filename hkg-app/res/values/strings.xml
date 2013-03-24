@@ -13,12 +13,16 @@
     <string name="bookmark_saved">賣飛佛</string>
     <string name="bookmark_list_empty">沒有賣飛佛</string>
     <string name="search_result_list_empty">沒有搜尋結果</string>
-    
     <string name="thread_loading_start">稍候片刻</string>
     <string name="thread_loading_error">出事架嘛 - load 唔到</string>
     <string name="topic_loading_error">高登熄燈?</string>
     <!-- bookmark fragment -->
     <string name="menu_edit">修改</string>
     <string name="menu_done">完成</string>
+    <string name="toast_gallery_image_list_empty">此 POST 沒有相片</string>
+    <string name="toast_thread_page_loaded">第 %d 頁</string>
+    <string name="dialog_input_thread_id">請輸入 POST ID 然後按確定</string>
+    <string name="dialog_input_thread_ok">確定</string>
+    <string name="dialog_input_thread_cancel">取消</string>
 
 </resources>

@@ -179,7 +179,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 		Log.d(TAG, String.format("onNavigationItemChanged(), switch page[%d]",
 				newPage));
 
-		Toast.makeText(getApplicationContext(), "Thread page " + newPage,
+		Toast.makeText(getApplicationContext(),
+				getString(R.string.toast_thread_page_loaded, newPage),
 				Toast.LENGTH_SHORT).show();
 
 		// TODO fix switch page. temporarily comment out to test thread fragment
@@ -277,28 +278,28 @@ public class MainActivity extends SlidingActionBarActivity implements
 		// }
 	}
 
-	/**
-	 * staring point of loading topic from current forum. will make network
-	 * call.
-	 * 
-	 * @param type
-	 * @param pageNo
-	 */
-	void startLoadTopic(final String type, final int pageNo) {
-		// load content
-		new Thread() {
-			public void run() {
-				Log.d(TAG, String.format("Network call, readTopicByPage()"));
-				HKGController controller = HKGController.getController();
-				controller.setHKGListener(MainActivity.this);
-				controller.readTopicByPage(type, pageNo);
-			}
-		}.start();
-
-		Toast.makeText(MainActivity.this,
-				"Topic Page " + getStaticFragment().getCurrentTopicPageNo(),
-				Toast.LENGTH_SHORT).show();
-	}
+	// /**
+	// * staring point of loading topic from current forum. will make network
+	// * call.
+	// *
+	// * @param type
+	// * @param pageNo
+	// */
+	// void startLoadTopic(final String type, final int pageNo) {
+	// // load content
+	// new Thread() {
+	// public void run() {
+	// Log.d(TAG, String.format("Network call, readTopicByPage()"));
+	// HKGController controller = HKGController.getController();
+	// controller.setHKGListener(MainActivity.this);
+	// controller.readTopicByPage(type, pageNo);
+	// }
+	// }.start();
+	//
+	// Toast.makeText(MainActivity.this,
+	// "Topic Page " + getStaticFragment().getCurrentTopicPageNo(),
+	// Toast.LENGTH_SHORT).show();
+	// }
 
 	/**
 	 * starting point of loading thread content. will make network call.
@@ -349,8 +350,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 			setPageSwitcher(thread);
 		} else {
 			Toast.makeText(MainActivity.this,
-					"This thread contains no page, probably being deleted",
-					Toast.LENGTH_LONG).show();
+					getString(R.string.thread_loading_error), Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 
@@ -531,7 +532,8 @@ public class MainActivity extends SlidingActionBarActivity implements
 			// TODO find a better way to display this
 			MainActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
-					Toast.makeText(MainActivity.this, "No thread in this page",
+					Toast.makeText(MainActivity.this,
+							getString(R.string.thread_loading_error),
 							Toast.LENGTH_SHORT).show();
 				}
 			});
@@ -853,10 +855,12 @@ public class MainActivity extends SlidingActionBarActivity implements
 
 			return new AlertDialog.Builder(getActivity())
 					.setTitle(R.string.app_name)
-					.setMessage("Please Enter Thread ID")
-					.setPositiveButton("OK", this)
-					.setNegativeButton("CANCEL", null).setView(editQuantity)
-					.create();
+					.setMessage(R.string.dialog_input_thread_id)
+					.setPositiveButton(
+							getString(R.string.dialog_input_thread_ok), this)
+					.setNegativeButton(
+							getString(R.string.dialog_input_thread_cancel),
+							null).setView(editQuantity).create();
 
 		}
 
@@ -872,7 +876,6 @@ public class MainActivity extends SlidingActionBarActivity implements
 	}
 
 	public void onUserSelectValue(String selectedValue) {
-		Toast.makeText(this, "Goto " + selectedValue, 1000).show();
 		String threadId = selectedValue;
 		int pageNo = 1;
 		showThreadById(threadId, pageNo);
