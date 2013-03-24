@@ -876,9 +876,11 @@ public class MainActivity extends SlidingActionBarActivity implements
 	}
 
 	public void onUserSelectValue(String selectedValue) {
-		String threadId = selectedValue;
-		int pageNo = 1;
-		showThreadById(threadId, pageNo);
+		if (!selectedValue.equals("")) {
+			String threadId = selectedValue;
+			int pageNo = 1;
+			showThreadById(threadId, pageNo);
+		}
 	}
 
 	/**
