@@ -124,7 +124,7 @@ public class HKGThread implements Serializable {
 			}
 
 			for (String realImg : realImgList) {
-				if (!realImg.startsWith("http://")) {
+				if (!realImg.startsWith("http")) {
 					realImg = "http://" + realImg;
 				}
 				contentHtml = contentHtml.replaceFirst(
