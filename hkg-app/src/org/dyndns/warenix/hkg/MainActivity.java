@@ -834,12 +834,12 @@ public class MainActivity extends SlidingActionBarActivity implements
 				thread.mSelectedPage);
 
 		Cursor c = getContentResolver().query(uri, null, null, null, null);
-		if (c == null) {
-			Uri insertUri = getContentResolver().insert(uri, values);
-			Log.d(TAG, "inserted uri:" + insertUri);
-		} else {
+		if (c != null && c.moveToNext()) {
 			int rows = getContentResolver().update(uri, values, null, null);
 			Log.d(TAG, "updated rows:" + rows);
+		} else {
+			Uri insertUri = getContentResolver().insert(uri, values);
+			Log.d(TAG, "inserted uri:" + insertUri);
 		}
 	}
 
