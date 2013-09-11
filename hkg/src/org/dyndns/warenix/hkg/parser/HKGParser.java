@@ -11,6 +11,7 @@ public abstract class HKGParser {
 	public void parse(String urlString) throws IOException {
 		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
+		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
 		String inputLine;

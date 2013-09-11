@@ -6,10 +6,12 @@
         <item>搜尋</item>
         <item>吹水台</item>
         <item>創意台</item>
-        <item>自組活動台</item>
+        <item>JTV台</item>
+        <item>活動台</item>
         <item>站務台</item>
         <item>電　台</item>
         <item>汽車台</item>
+        <item>上班台</item>
         <item>學術台</item>
         <item>攝影台</item>
         <item>影視台</item>
@@ -18,13 +20,16 @@
         <item>動漫台</item>
         <item>潮流台</item>
         <item>旅遊台</item>
+        <item>寵物台</item>
+        <item>親子台</item>
         <item>飲食台</item>
         <item>講故台</item>
         <item>感情台</item>
         <item>體育台</item>
+        <item>Apps台</item>
         <item>手機台</item>
         <item>軟件台</item>
-        <item>寬頻台</item>
+        <item>電訊台</item>
         <item>硬件台</item>
         <item>遊戲台</item>
         <item>財經台</item>
@@ -36,10 +41,12 @@
         <item>WS</item>
         <item>BW</item>
         <item>EP</item>
+        <item>JT</item>
         <item>AC</item>
         <item>MB</item>
         <item>RA</item>
         <item>TS</item>
+        <item>WK</item>
         <item>ST</item>
         <item>DC</item>
         <item>VI</item>
@@ -48,10 +55,13 @@
         <item>AN</item>
         <item>CO</item>
         <item>TR</item>
+        <item>PT</item>
+        <item>BB</item>
         <item>ED</item>
         <item>SY</item>
         <item>LV</item>
         <item>SP</item>
+        <item>AP</item>
         <item>MP</item>
         <item>SW</item>
         <item>IN</item>

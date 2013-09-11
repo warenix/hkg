@@ -35,7 +35,7 @@ public class HKGListParser extends HKGParser {
 			// System.out.println(inputLine);
 			switch (mCurrentStep) {
 			case FIND_TOPIC:
-				if (inputLine.equals("     <div class=\"TopicBox_Details\">")) {
+				if (inputLine.equals("<div class=\"TopicBox_Details\">")) {
 					mCurrentStep = Step.FIND_TOPIC_ID;
 				}
 				break;
@@ -50,7 +50,7 @@ public class HKGListParser extends HKGParser {
 				}
 
 				if (inputLine
-						.equals("         <div class=\"TopicBox_Replies\">")) {
+						.equals("<div class=\"TopicBox_Replies\">")) {
 					mCurrentStep = Step.FIND_TOPIC_REPLIES_COUNT;
 				}
 				break;
@@ -60,7 +60,7 @@ public class HKGListParser extends HKGParser {
 				mCurrentStep = Step.FIND_TOPIC_TITLE;
 				break;
 			case FIND_TOPIC_TITLE:
-				if (!("         <div>".equals(inputLine) || "         </div>"
+				if (!("<div>".equals(inputLine) || "</div>"
 						.equals(inputLine))) {
 					mThread.mTitle = inputLine.trim().replace(
 							"&nbsp;&nbsp;-&nbsp;", "");

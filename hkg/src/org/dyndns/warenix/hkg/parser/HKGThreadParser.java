@@ -42,7 +42,7 @@ public class HKGThreadParser extends HKGParser {
 		if (inputLine.replace(" ", "").length() > 0) {
 			// System.out.println(inputLine);
 
-			if ("    <div id=\"bottomFunc\" class=\"View_PageSelectPanel2\"></div>"
+			if ("<div id=\"bottomFunc\" class=\"View_PageSelectPanel2\"></div>"
 					.equals(inputLine)) {
 				// all replies are parsed, lines below can be ignored
 
@@ -53,7 +53,7 @@ public class HKGThreadParser extends HKGParser {
 
 			switch (mCurrentStep) {
 			case FIND_THERAD_TITLE:
-				if (inputLine.startsWith("    <title>")) {
+				if (inputLine.startsWith("<title>")) {
 					Matcher matcher = HKGParser.mTitlePattern
 							.matcher(inputLine);
 					if (matcher.find()) {
@@ -68,7 +68,7 @@ public class HKGThreadParser extends HKGParser {
 				}
 				break;
 			case FIND_THREAD_PAGE_COUNT:
-				if (pageSectionFound && inputLine.startsWith("    </select>")) {
+				if (pageSectionFound && inputLine.startsWith("</select>")) {
 					pageSectionFound = false;
 					// mPage.setPageCount(selectedPage - 2, pageCount - 3);
 
@@ -81,7 +81,7 @@ public class HKGThreadParser extends HKGParser {
 					mCurrentStep = Step.FIND_THREAD_REPLY;
 				} else if (!pageSectionFound
 						&& inputLine
-								.startsWith("    <select class=\"View_PageSelect\" ")) {
+								.startsWith("<select class=\"View_PageSelect\" ")) {
 					pageSectionFound = true;
 				}
 				if (pageSectionFound) {
@@ -92,12 +92,12 @@ public class HKGThreadParser extends HKGParser {
 				}
 				break;
 			case FIND_THREAD_REPLY:
-				if ("   <div class=\"ReplyBox\">".equals(inputLine)) {
+				if ("<div class=\"ReplyBox\">".equals(inputLine)) {
 					mCurrentStep = Step.FIND_THREAD_REPLY_USER;
 				}
 				break;
 			case FIND_THREAD_REPLY_USER:
-				if (inputLine.startsWith("       <span")) {
+				if (inputLine.startsWith("<span")) {
 					Matcher matcher = mReplyUserPattern.matcher(inputLine);
 					if (matcher.find()) {
 						reply = new HKGReply();
@@ -107,17 +107,17 @@ public class HKGThreadParser extends HKGParser {
 				}
 				break;
 			case FIND_THREAD_REPLY_POST_DATE:
-				if (inputLine.startsWith("       <div class=\"ViewDate\"")) {
+				if (inputLine.startsWith("<div class=\"ViewDate\"")) {
 					Matcher matcher = mPostDatePattern.matcher(inputLine);
 					if (matcher.find()) {
 						reply.mPostDate = matcher.group(1);
 					}
-				} else if ("     </div>".equals(inputLine)) {
+				} else if (reply.mPostDate!=null && "</div>".equals(inputLine)) {
 					mCurrentStep = Step.FIND_THREAD_REPLY_CONTENT;
 				}
 				break;
 			case FIND_THREAD_REPLY_CONTENT:
-				if (inputLine.startsWith("     <div class=\"FloatsClearing\"")) {
+				if (inputLine.startsWith("<div class=\"FloatsClearing\"")) {
 					// reply.mContent = content.toString();
 					reply.setContent(content.toString());
 					mPage.addReply(reply);
