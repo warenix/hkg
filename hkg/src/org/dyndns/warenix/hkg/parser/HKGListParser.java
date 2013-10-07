@@ -32,10 +32,11 @@ public class HKGListParser extends HKGParser {
 	@Override
 	public boolean feed(String inputLine) {
 		if (inputLine.replace(" ", "").length() > 0) {
-			// System.out.println(inputLine);
+			System.out.println(inputLine);
 			switch (mCurrentStep) {
 			case FIND_TOPIC:
-				if (inputLine.equals("<div class=\"TopicBox_Details\">")) {
+				String topicString = inputLine.trim();
+				if (topicString.equals("<div class=\"TopicBox_Details\">")) {
 					mCurrentStep = Step.FIND_TOPIC_ID;
 				}
 				break;
@@ -49,8 +50,7 @@ public class HKGListParser extends HKGParser {
 					}
 				}
 
-				if (inputLine
-						.equals("<div class=\"TopicBox_Replies\">")) {
+				if (inputLine.contains("<div class=\"TopicBox_Replies\">")) {
 					mCurrentStep = Step.FIND_TOPIC_REPLIES_COUNT;
 				}
 				break;
@@ -60,8 +60,9 @@ public class HKGListParser extends HKGParser {
 				mCurrentStep = Step.FIND_TOPIC_TITLE;
 				break;
 			case FIND_TOPIC_TITLE:
-				if (!("<div>".equals(inputLine) || "</div>"
-						.equals(inputLine))) {
+				String topicTitleString = inputLine.trim();
+				if (!("<div>".equals(topicTitleString) || "</div>"
+						.equals(topicTitleString))) {
 					mThread.mTitle = inputLine.trim().replace(
 							"&nbsp;&nbsp;-&nbsp;", "");
 					mCurrentStep = Step.FIND_TOPIC_USER;

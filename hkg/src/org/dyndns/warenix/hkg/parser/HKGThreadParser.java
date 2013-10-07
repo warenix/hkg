@@ -39,8 +39,9 @@ public class HKGThreadParser extends HKGParser {
 
 	@Override
 	public boolean feed(String inputLine) {
+		inputLine = inputLine.trim();
 		if (inputLine.replace(" ", "").length() > 0) {
-			// System.out.println(inputLine);
+			System.out.println(inputLine);
 
 			if ("<div id=\"bottomFunc\" class=\"View_PageSelectPanel2\"></div>"
 					.equals(inputLine)) {
@@ -112,7 +113,8 @@ public class HKGThreadParser extends HKGParser {
 					if (matcher.find()) {
 						reply.mPostDate = matcher.group(1);
 					}
-				} else if (reply.mPostDate!=null && "</div>".equals(inputLine)) {
+				} else if (reply.mPostDate != null
+						&& "</div>".equals(inputLine)) {
 					mCurrentStep = Step.FIND_THREAD_REPLY_CONTENT;
 				}
 				break;

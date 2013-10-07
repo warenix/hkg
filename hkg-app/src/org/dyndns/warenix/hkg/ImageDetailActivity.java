@@ -58,6 +58,8 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+		mImageList = getIntent().getStringArrayListExtra(EXTRA_IMAGE);
+		
 		// Fetch screen height and width, to use as our max size when loading
 		// images as this
 		// activity runs full screen
@@ -139,7 +141,7 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		 * mPager.setCurrentItem(extraCurrentItem); }
 		 */
 
-		mImageList = getIntent().getStringArrayListExtra(EXTRA_IMAGE);
+		
 
 	}
 
