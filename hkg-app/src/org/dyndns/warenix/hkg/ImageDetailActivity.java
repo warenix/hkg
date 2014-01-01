@@ -26,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +47,7 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 	private ImagePagerAdapter mAdapter;
 	private ImageFetcher mImageFetcher;
 	private ViewPager mPager;
+	private int total = 0;
 
 	private ArrayList<String> mImageList;
 
@@ -59,7 +61,10 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		mImageList = getIntent().getStringArrayListExtra(EXTRA_IMAGE);
-		
+		total = mImageList.size();
+		if (total > 0) {
+			updateTitle(0);
+		}
 		// Fetch screen height and width, to use as our max size when loading
 		// images as this
 		// activity runs full screen
@@ -102,6 +107,21 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		 */
 		mPager.setPageMargin(2);
 		mPager.setOffscreenPageLimit(2);
+		mPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+			@Override
+			public void onPageSelected(int page) {
+				updateTitle(page);
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+		});
 
 		// Set up activity to go full screen
 		// getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
@@ -141,8 +161,12 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		 * mPager.setCurrentItem(extraCurrentItem); }
 		 */
 
-		
+	}
 
+	private void updateTitle(int imageIndex) {
+		setTitle(String.format("%s %d/%d",
+				getResources().getString(R.string.app_name), imageIndex + 1,
+				total));
 	}
 
 	@Override
