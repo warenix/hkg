@@ -178,7 +178,7 @@ public class HKGThread implements Serializable {
 						+ relatievImg);
 			}
 
-			System.out.println(contentHtml);
+			// System.out.println(contentHtml);
 			return contentHtml;
 		}
 
