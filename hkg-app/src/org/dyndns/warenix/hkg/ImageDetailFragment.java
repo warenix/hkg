@@ -16,23 +16,13 @@
 
 package org.dyndns.warenix.hkg;
 
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.dyndns.warenix.hkg.HKGThread.HKGPage;
-import org.dyndns.warenix.hkg.HKGThread.HKGReply;
-import org.dyndns.warenix.hkg.parser.HKGParser;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.android.bitmapfun.util.ImageFetcher;
 import com.example.android.bitmapfun.util.ImageWorker;

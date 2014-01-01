@@ -31,8 +31,8 @@ public class HKGListParser extends HKGParser {
 
 	@Override
 	public boolean feed(String inputLine) {
+		//System.out.println(inputLine);
 		if (inputLine.replace(" ", "").length() > 0) {
-			System.out.println(inputLine);
 			switch (mCurrentStep) {
 			case FIND_TOPIC:
 				String topicString = inputLine.trim();

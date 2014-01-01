@@ -11,14 +11,13 @@ public class TestHKGTController {
 		MyHKGListener listener = new MyHKGListener();
 		HKGController controller = HKGController.getController();
 		controller.setHKGListener(listener);
-		/*controller.readTopicByPage("BW", 1);*/
-		
-		HKGThread thread = new HKGThread("4695620");
+		// controller.readTopicByPage("BW", 1);
+
+		HKGThread thread = new HKGThread("4901599");
 		controller.readThreadByPage(thread, 1);
-		//System.out.println(thread.getPage(2).getReplyList().size());
-		//controller.readThreadByPage(thread, 2);
+		// System.out.println(thread.getPage(2).getReplyList().size());
+		// controller.readThreadByPage(thread, 2);
 		System.out.println(thread.getPage(1).getReplyList().size());
-		
 
 	}
 

@@ -146,7 +146,7 @@ public class HKGThread implements Serializable {
 				}
 
 			}
-			final String domain = "http://m.hkgolden.com";
+			final String domain = "http://m3.hkgolden.com";
 			for (String relatievImg : relativeImgList) {
 				if (relatievImg.startsWith("//")) {
 					contentHtml = contentHtml.replaceAll(relatievImg, "http:"
@@ -172,7 +172,7 @@ public class HKGThread implements Serializable {
 				}
 
 			}
-			final String domain = "http://m.hkgolden.com";
+			final String domain = Config.getRandomDomain();
 			for (String relatievImg : relativeImgList) {
 				contentHtml = contentHtml.replaceAll(relatievImg, domain
 						+ relatievImg);

@@ -5,18 +5,18 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.hkg.parser.HKGParser;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
-
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,9 +24,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -91,6 +92,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		// setHasOptionsMenu(true);
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -98,9 +100,17 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				false);
 		if (this.isAdded()) {
 			mWebView = (WebView) view.findViewById(R.id.webView1);
-			mWebView.getSettings().setDefaultTextEncodingName("utf-8");
-			mWebView.getSettings().setBuiltInZoomControls(true);
-			mWebView.getSettings().setUseWideViewPort(true);
+
+			WebSettings settings = mWebView.getSettings();
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				settings.setLayoutAlgorithm(LayoutAlgorithm.TEXT_AUTOSIZING);
+			}
+			settings.setDefaultTextEncodingName("utf-8");
+			settings.setBuiltInZoomControls(true);
+			settings.setUseWideViewPort(true);
+			settings.setLoadWithOverviewMode(true);
+
 			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 			mWebView.setBackgroundColor(Color.BLACK);
 			setWebViewContent(getString(R.string.thread_loading_start));

@@ -3,13 +3,6 @@ package org.dyndns.warenix.hkgcp.test;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
 import org.dyndns.warenix.hkg.provider.HKGProvider;
 
-import android.content.ContentProvider;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.test.ProviderTestCase2;
-import android.util.Log;
-
 public class SimpleProviderTestCase2 extends ProviderTestCase2<HKGProvider> {
 
 	private static final String TAG = "SimpleProviderTestCase2";

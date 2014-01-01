@@ -24,8 +24,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 
 public class HKGSearchFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {

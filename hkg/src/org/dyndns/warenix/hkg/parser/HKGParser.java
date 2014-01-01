@@ -7,11 +7,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Pattern;
 
+import org.dyndns.warenix.hkg.Config;
+
 public abstract class HKGParser {
 	public void parse(String urlString) throws IOException {
 		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
+		conn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
 		String inputLine;
@@ -31,12 +34,12 @@ public abstract class HKGParser {
 	public abstract boolean feed(String inputLine);
 
 	public static class PageRequest {
-		static final String DOMAIN = "http://m.hkgolden.com/";
 		static final String READ_THERAD_PATH = "view.aspx";
 		static final String LIST_THERAD_PATH = "topics.aspx";
 
 		public static String getReadThreadUrl(String threadId, int pageNo) {
-			String url = DOMAIN + READ_THERAD_PATH + "?";
+			final String domain = Config.getRandomDomain();
+			String url = domain + READ_THERAD_PATH + "?";
 			// fill get parameters
 			url += String.format("&message=%s", threadId);
 			url += String.format("&page=%d", pageNo);
@@ -44,7 +47,8 @@ public abstract class HKGParser {
 		}
 
 		public static String getListUrl(String type, int pageNo) {
-			String url = DOMAIN + LIST_THERAD_PATH + "?";
+			final String domain = Config.getRandomDomain();
+			String url = domain + LIST_THERAD_PATH + "?";
 			// fill get parameters
 			url += String.format("&type=%s", type);
 			url += String.format("&page=%d", pageNo);

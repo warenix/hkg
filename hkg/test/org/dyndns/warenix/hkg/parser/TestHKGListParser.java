@@ -23,7 +23,7 @@ public class TestHKGListParser {
 			ArrayList<HKGThread> threadList = parser.getHKGThreadList();
 
 			for (HKGThread thread : threadList) {
-				System.out.println(thread.mUser);
+				System.out.println(thread);
 			}
 
 		} catch (Exception e) {
