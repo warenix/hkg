@@ -136,8 +136,9 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		s.append("</style>");
 		s.append("<div id=\"hkgcontent\">");
 		s.append(content);
-		s.append("</html>");
 		s.append("</div>");
+		s.append("</html>");
+		Log.v(TAG, s.toString());
 		loadAndCleanData(mWebView, s.toString());
 	}
 
@@ -245,8 +246,9 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				i.setType("text/plain");
 				i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
 				i.putExtra(Intent.EXTRA_TEXT, String.format(
-						"http://m.hkgolden.com/view.aspx?message=%s&page=%s",
-						mThread.mThreadId, mThread.mSelectedPage));
+						"%sview.aspx?message=%s&page=%s",
+						Config.getRandomDomain(), mThread.mThreadId,
+						mThread.mSelectedPage));
 				startActivity(Intent.createChooser(i, "Share URL"));
 				return true;
 

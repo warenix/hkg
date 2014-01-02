@@ -7,19 +7,24 @@ public class Config {
 	private static final int MAX_ROBBIN = 3;
 	private static int sRoundRobbinCounter = 0;
 
+	static String[] domains = new String[MAX_ROBBIN];
+
+	static {
+		for (int i = 0; i < MAX_ROBBIN; ++i) {
+			domains[i] = String.format("http://m%d.hkgolden.com/", i);
+		}
+	}
+
 	/**
 	 * get random m{1,2,3} servers
 	 * 
 	 * @return
 	 */
 	public static String getRandomDomain() {
-		if (sRoundRobbinCounter >= MAX_ROBBIN) {
+		sRoundRobbinCounter++;
+		if (sRoundRobbinCounter == MAX_ROBBIN) {
 			sRoundRobbinCounter = 0;
 		}
-		sRoundRobbinCounter++;
-		String domain = String.format("http://m%d.hkgolden.com/",
-				sRoundRobbinCounter);
-		System.out.println(domain);
-		return domain;
+		return domains[sRoundRobbinCounter];
 	}
 }
