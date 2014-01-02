@@ -1197,17 +1197,18 @@ containing a value of this type.
          */
         public static final int abs__shareactionprovider_share_with_application=0x7f0a0007;
         public static final int app_name=0x7f0a000d;
-        public static final int bookmark_list_empty=0x7f0a001a;
-        public static final int bookmark_saved=0x7f0a0019;
-        public static final int dialog_input_thread_cancel=0x7f0a0025;
-        public static final int dialog_input_thread_id=0x7f0a0023;
-        public static final int dialog_input_thread_ok=0x7f0a0024;
+        public static final int bookmark_list_empty=0x7f0a001b;
+        public static final int bookmark_saved=0x7f0a001a;
+        public static final int dialog_input_thread_cancel=0x7f0a0027;
+        public static final int dialog_input_thread_id=0x7f0a0025;
+        public static final int dialog_input_thread_ok=0x7f0a0026;
         public static final int hello_world=0x7f0a000e;
-        public static final int menu_bookmark=0x7f0a0018;
-        public static final int menu_done=0x7f0a0020;
+        public static final int menu_bookmark=0x7f0a0019;
+        public static final int menu_clipboard=0x7f0a0017;
+        public static final int menu_done=0x7f0a0021;
         /**  bookmark fragment 
          */
-        public static final int menu_edit=0x7f0a001f;
+        public static final int menu_edit=0x7f0a0020;
         /**  thread fragment 
          */
         public static final int menu_gallery=0x7f0a0016;
@@ -1216,15 +1217,16 @@ containing a value of this type.
         public static final int menu_refresh=0x7f0a0012;
         public static final int menu_search=0x7f0a0013;
         public static final int menu_settings=0x7f0a000f;
-        public static final int menu_share=0x7f0a0017;
-        public static final int search_result_list_empty=0x7f0a001b;
+        public static final int menu_share=0x7f0a0018;
+        public static final int search_result_list_empty=0x7f0a001c;
         public static final int search_view_hints=0x7f0a0015;
-        public static final int thread_loading_error=0x7f0a001d;
-        public static final int thread_loading_start=0x7f0a001c;
+        public static final int thread_loading_error=0x7f0a001e;
+        public static final int thread_loading_start=0x7f0a001d;
         public static final int title_activity_main=0x7f0a0010;
-        public static final int toast_gallery_image_list_empty=0x7f0a0021;
-        public static final int toast_thread_page_loaded=0x7f0a0022;
-        public static final int topic_loading_error=0x7f0a001e;
+        public static final int toast_clipboard_post_empty=0x7f0a0023;
+        public static final int toast_gallery_image_list_empty=0x7f0a0022;
+        public static final int toast_thread_page_loaded=0x7f0a0024;
+        public static final int topic_loading_error=0x7f0a001f;
     }
     public static final class style {
         /** 

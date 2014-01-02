@@ -8,6 +8,7 @@
     <string name="search_view_hints">用 google 搜尋</string>
     <!-- thread fragment -->
     <string name="menu_gallery">相集</string>
+    <string name="menu_clipboard">複制原文</string>
     <string name="menu_share">分享</string>
     <string name="menu_bookmark">劉明</string>
     <string name="bookmark_saved">賣飛佛</string>
@@ -20,6 +21,7 @@
     <string name="menu_edit">修改</string>
     <string name="menu_done">完成</string>
     <string name="toast_gallery_image_list_empty">此 POST 沒有相片</string>
+    <string name="toast_clipboard_post_empty">找不到原文</string>
     <string name="toast_thread_page_loaded">第 %d 頁</string>
     <string name="dialog_input_thread_id">請輸入 POST ID 然後按確定</string>
     <string name="dialog_input_thread_ok">確定</string>

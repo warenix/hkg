@@ -15,6 +15,7 @@ import org.dyndns.warenix.hkg.provider.HKGMetaData;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -92,7 +93,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	}
 
 	public HKGThreadFragment() {
-		// setHasOptionsMenu(true);
+		setHasOptionsMenu(true);
 	}
 
 	@SuppressLint("NewApi")
@@ -141,7 +142,6 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		s.append(content);
 		s.append("</div>");
 		s.append("</html>");
-		Log.v(TAG, s.toString());
 		loadAndCleanData(mWebView, s.toString());
 	}
 
@@ -281,6 +281,44 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				return true;
 			}
 		});
+
+		MenuItem clipboard = menu.add(getString(R.string.menu_clipboard));
+		clipboard.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		clipboard.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				HKGPage page = mThread.getPage(mThread.mSelectedPage);
+				if (page.getReplyList().size() > 0) {
+					String content = removeTags(page.getReplyList().get(0).mContent
+							.replace("<br />", "\n"));
+
+					Intent sendIntent = new Intent();
+					sendIntent.setAction(Intent.ACTION_SEND);
+					sendIntent.putExtra(Intent.EXTRA_SUBJECT, "");
+					sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+					sendIntent.setType("text/plain");
+
+					Context context = getActivity();
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+						// This will open the "Complete action with" dialog if
+						// the
+						// user doesn't have a default app set.
+						context.startActivity(sendIntent);
+					} else {
+						context.startActivity(Intent.createChooser(sendIntent,
+								"Share Via"));
+					}
+				} else {
+					Toast.makeText(getActivity(),
+							getString(R.string.toast_clipboard_post_empty),
+							Toast.LENGTH_SHORT).show();
+				}
+
+				return true;
+			}
+		});
 	}
 
 	/**
@@ -337,5 +375,19 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		}
 		Log.d(TAG, "found " + imageList.size());
 		return imageList;
+	}
+
+	public String removeTags(String in) {
+		int index = 0;
+		int index2 = 0;
+		while (index != -1) {
+			index = in.indexOf("<");
+			index2 = in.indexOf(">", index);
+			if (index != -1 && index2 != -1) {
+				in = in.substring(0, index).concat(
+						in.substring(index2 + 1, in.length()));
+			}
+		}
+		return in;
 	}
 }

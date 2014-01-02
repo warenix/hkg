@@ -11,7 +11,7 @@ public class Config {
 
 	static {
 		for (int i = 0; i < MAX_ROBBIN; ++i) {
-			domains[i] = String.format("http://m%d.hkgolden.com/", i);
+			domains[i] = String.format("http://m%d.hkgolden.com/", i + 1);
 		}
 	}
 
@@ -25,6 +25,7 @@ public class Config {
 		if (sRoundRobbinCounter == MAX_ROBBIN) {
 			sRoundRobbinCounter = 0;
 		}
-		return domains[sRoundRobbinCounter];
+		String domain = domains[sRoundRobbinCounter];
+		return domain;
 	}
 }
