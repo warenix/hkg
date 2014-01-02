@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import org.dyndns.warenix.abs.activity.SimpleABSActionbarActivity;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -48,6 +50,7 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 	private ImageFetcher mImageFetcher;
 	private ViewPager mPager;
 	private int total = 0;
+	private int mCurrentImageIndex = 0;
 
 	private ArrayList<String> mImageList;
 
@@ -164,6 +167,7 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 	}
 
 	private void updateTitle(int imageIndex) {
+		mCurrentImageIndex = imageIndex;
 		setTitle(String.format("%s %d/%d",
 				getResources().getString(R.string.app_name), imageIndex + 1,
 				total));
@@ -261,5 +265,9 @@ public class ImageDetailActivity extends SimpleABSActionbarActivity implements
 		// mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 		// }
 		/* mInfo.setVisibility(enableSwipe ? View.VISIBLE : View.INVISIBLE); */
+		// open browser
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(getImageUrl(mCurrentImageIndex)));
+		startActivity(i);
 	}
 }

@@ -5,12 +5,14 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
 import org.dyndns.warenix.hkg.parser.HKGParser;
 import org.dyndns.warenix.hkg.provider.HKGMetaData;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -28,6 +30,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -312,7 +315,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			String src = null;
 			while (srcMatcher.find()) {
 				src = srcMatcher.group(1);
-				if (!(src.startsWith("http://m.hkgolden.com/faces/") || imageList
+				if (!(src.contains("hkgolden.com/faces/") || imageList
 						.contains(src))) {
 					imageList.add(src);
 				}
@@ -326,7 +329,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 				smallSrc = src.toLowerCase();
 				if ((smallSrc.endsWith("jpg") || smallSrc.endsWith("png") || smallSrc
 						.endsWith("gif"))
-						&& !(src.startsWith("http://m.hkgolden.com/faces/") || imageList
+						&& !(src.contains("hkgolden.com/faces/") || imageList
 								.contains(src))) {
 					imageList.add(src);
 				}
