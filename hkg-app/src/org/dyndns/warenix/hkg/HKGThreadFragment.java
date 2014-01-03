@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -291,8 +292,14 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			public boolean onMenuItemClick(MenuItem item) {
 				HKGPage page = mThread.getPage(mThread.mSelectedPage);
 				if (page.getReplyList().size() > 0) {
-					String content = removeTags(page.getReplyList().get(0).mContent
-							.replace("<br />", "\n"));
+					// String content = mThread.mTitle
+					// + "\n\n"
+					// + removeTags(page.getReplyList().get(0).mContent
+					// .replace("<br />", "\n"));
+					String content = Html.fromHtml(
+							mThread.mTitle + "\n\n"
+									+ page.getReplyList().get(0).mContent)
+							.toString();
 
 					Intent sendIntent = new Intent();
 					sendIntent.setAction(Intent.ACTION_SEND);
