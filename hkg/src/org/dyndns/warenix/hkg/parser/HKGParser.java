@@ -13,8 +13,8 @@ public abstract class HKGParser {
 	public void parse(String urlString) throws IOException {
 		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
-		conn.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
+//		conn.setRequestProperty("User-Agent",
+//				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
 		String inputLine;
@@ -48,10 +48,12 @@ public abstract class HKGParser {
 
 		public static String getListUrl(String type, int pageNo) {
 			final String domain = Config.getRandomDomain();
-			String url = domain + LIST_THERAD_PATH + "?";
-			// fill get parameters
-			url += String.format("&type=%s", type);
-			url += String.format("&page=%d", pageNo);
+			String url = null;
+			if (pageNo == 1) {
+				url = domain + String.format("topics_%s.htm", type);
+			} else {
+				url = domain + String.format("topics_%s_%d.htm", type, pageNo);
+			}
 			return url;
 		}
 	}
