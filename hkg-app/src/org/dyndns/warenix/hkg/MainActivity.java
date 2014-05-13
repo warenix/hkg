@@ -47,6 +47,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 	}
 
 	private String mDefaultTimeFilter = "m";
+	private int mCurrentPage;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -196,8 +197,13 @@ public class MainActivity extends SlidingActionBarActivity implements
 		startLoadThread(thread, newPage);
 		setSwitchThreadPageAdapter(thread.mTitle, thread.mPageCount,
 				itemPosition);
+		mCurrentPage = newPage;
 
 		return true;
+	}
+
+	public void showNextThreadPage() {
+		onNavigationItemChanged(mCurrentPage, 0);
 	}
 
 	void switchThreadPage(HKGThread thread) {

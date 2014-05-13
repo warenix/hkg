@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dyndns.warenix.abs.activity.SwitchPageAdapter;
+import org.dyndns.warenix.hkg.BottomButtonWebView.OnBottomReachedListener;
 import org.dyndns.warenix.hkg.HKGController.HKGListener;
 import org.dyndns.warenix.hkg.HKGThread.HKGPage;
 import org.dyndns.warenix.hkg.HKGThread.HKGReply;
@@ -27,6 +28,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
@@ -40,7 +42,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 public class HKGThreadFragment extends SherlockFragment implements HKGListener {
-	WebView mWebView;
+	BottomButtonWebView mWebView;
 
 	static final String TAG = "HKGThreadFragment";
 
@@ -55,9 +57,11 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	 * Currently displayed thread
 	 */
 	HKGThread mThread;
-
+	private boolean mLoaded = false;
 	Handler mUIHandler = new Handler() {
+
 		public void handleMessage(Message msg) {
+			mLoaded = true;
 			mThread = (HKGThread) msg.obj;
 
 			// HKGPage page = mThread.mPageMap.get(mThread.mSelectedPage);
@@ -67,6 +71,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			} else {
 				setWebViewContent(formatHKGPageToHTML(page));
 			}
+
+			mLoadNextPage.setVisibility(View.GONE);
 		}
 	};
 
@@ -80,6 +86,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	// + "img {max-width:100%;}";
 
 	final String mCss = mCssViewQuote + mCssColorTheme;
+
+	private View mLoadNextPage;
 
 	public static HKGThreadFragment newInstance(String threadId, int pageNo) {
 		HKGThreadFragment f = new HKGThreadFragment();
@@ -104,7 +112,27 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		View view = inflater.inflate(R.layout.activity_webview, container,
 				false);
 		if (this.isAdded()) {
-			mWebView = (WebView) view.findViewById(R.id.webView1);
+			mLoadNextPage = view.findViewById(R.id.load_next_page);
+			mLoadNextPage.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					mLoadNextPage.setVisibility(View.GONE);
+					Log.d(TAG, "current page:" + mThread.mSelectedPage);
+					((MainActivity) getActivity()).showNextThreadPage();
+				}
+			});
+			mWebView = (BottomButtonWebView) view.findViewById(R.id.webView1);
+			mWebView.setOnBottomReachedListener(new OnBottomReachedListener() {
+
+				@Override
+				public void OnBottomReached() {
+					Log.d(TAG, "selected page?" + mThread.mSelectedPage);
+					if (mThread.mSelectedPage < mThread.mPageCount) {
+						mLoadNextPage.setVisibility(View.VISIBLE);
+					}
+				}
+			});
 
 			WebSettings settings = mWebView.getSettings();
 
@@ -142,6 +170,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		s.append("<div id=\"hkgcontent\">");
 		s.append(content);
 		s.append("</div>");
+		// // add load next page button
+		// s.append("<div><button type=\"button\" id=\"loadNextPage\" style=\"display: block; width: 100%; height:15%\" onclick=\"loadNextPage();\">下一頁</button></div>");
 		s.append("</html>");
 		loadAndCleanData(mWebView, s.toString());
 	}

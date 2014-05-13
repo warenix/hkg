@@ -13,10 +13,11 @@ import org.dyndns.warenix.hkg.Config;
 
 public abstract class HKGParser {
   public void parse(String urlString) throws IOException {
+	  System.out.println(urlString);
     URL url = new URL(urlString);
     URLConnection conn = url.openConnection();
-    // conn.setRequestProperty("User-Agent",
-    // "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0");
+     conn.setRequestProperty("User-Agent",
+     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0");
     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
     String inputLine;
     while ((inputLine = in.readLine()) != null)
@@ -66,7 +67,7 @@ public abstract class HKGParser {
           url = domain + String.format("topics.aspx?type=%s", type);
         }
       } else {
-        if (isCached(type)) {
+        if (isCached(type) && pageNo <=3) {
           url = domain + String.format("topics_%s_%d.htm", type, pageNo);
         } else {
           url = domain + String.format("topics.aspx?type=%s&page=%d", type, pageNo);

@@ -15,7 +15,9 @@ import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,6 +37,9 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 
 	CursorAdapter mAdapter;
 	HKGThreadListener mListener;
+
+	MenuItem refresh;
+	MenuItem more;
 
 	/*
 	 * the scroll list view item to top will be performed after loader finished.
@@ -99,11 +104,22 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		setListShown(false);
 		setEmptyText(getString(R.string.topic_loading_error));
 		setHasOptionsMenu(true);
+		Button loadNextPageButton = new Button(getActivity());
+		loadNextPageButton
+				.setText(getResources().getString(R.string.menu_more));
+		loadNextPageButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mListener.onHKGThreadMoreClicked(more);
+			}
+		});
+		getListView().addFooterView(loadNextPageButton);
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		MenuItem refresh = menu.add(getString(R.string.menu_refresh));
+		refresh = menu.add(getString(R.string.menu_refresh));
 		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -114,7 +130,7 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 			}
 		});
 
-		MenuItem more = menu.add(getString(R.string.menu_more));
+		more = menu.add(getString(R.string.menu_more));
 		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {

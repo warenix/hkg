@@ -3,11 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <WebView
+    <org.dyndns.warenix.hkg.BottomButtonWebView
         android:id="@+id/webView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/load_next_page"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
+
+    <Button
+        android:id="@+id/load_next_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/menu_more"
+        android:visibility="gone" />
 
 </RelativeLayout>

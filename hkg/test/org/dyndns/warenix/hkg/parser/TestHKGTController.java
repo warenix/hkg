@@ -12,17 +12,19 @@ public class TestHKGTController {
 		MyHKGListener listener = new MyHKGListener();
 		HKGController controller = HKGController.getController();
 		controller.setHKGListener(listener);
-		// controller.readTopicByPage("BW", 1);
+		controller.readTopicByPage("BW", 4);
 
-		HKGThread thread = new HKGThread("4905614");
-		controller.readThreadByPage(thread, 1);
-		// System.out.println(thread.getPage(2).getReplyList().size());
-		// controller.readThreadByPage(thread, 2);
-		System.out
-				.println(thread.getPage(1).getReplyList().size() + " replies");
-		for (HKGReply reply : thread.getPage(1).getReplyList()) {
-			System.out.println(reply);
-		}
+		// String threadId = "5117045";
+		// int pageNo = 4;
+		// HKGThread thread = new HKGThread(threadId);
+		// controller.readThreadByPage(thread, pageNo);
+		// // System.out.println(thread.getPage(2).getReplyList().size());
+		// // controller.readThreadByPage(thread, 2);
+		// System.out.println(thread.getPage(pageNo).getReplyList().size()
+		// + " replies");
+		// for (HKGReply reply : thread.getPage(pageNo).getReplyList()) {
+		// System.out.println(reply);
+		// }
 
 	}
 
