@@ -327,7 +327,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 					// + removeTags(page.getReplyList().get(0).mContent
 					// .replace("<br />", "\n"));
 					String content = Html.fromHtml(
-							mThread.mTitle + "\n\n"
+							"*" + mThread.mTitle + "*" + "\n\n"
 									+ page.getReplyList().get(0).mContent)
 							.toString();
 
