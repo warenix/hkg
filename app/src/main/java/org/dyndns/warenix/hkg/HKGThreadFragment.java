@@ -69,7 +69,10 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			if (page == null) {
 				setWebViewContent(getString(R.string.thread_loading_error));
 			} else {
-				setWebViewContent(formatHKGPageToHTML(page));
+                            String html =formatHKGPageToHTML(page);
+                            html = html.replace("src=", "onload=\"resize(this);\" src=");
+				setWebViewContent(html);
+
 			}
 
 			mLoadNextPage.setVisibility(View.GONE);
@@ -143,6 +146,8 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			settings.setBuiltInZoomControls(true);
 			settings.setUseWideViewPort(true);
 			settings.setLoadWithOverviewMode(true);
+                        settings.setJavaScriptEnabled(true);
+//                        settings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 
 			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 			mWebView.setBackgroundColor(Color.BLACK);
@@ -159,6 +164,30 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 	public void setWebViewContent(String content) {
 		StringBuffer s = new StringBuffer();
 		s.append("<html>");
+		s.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\"\n"+ "    \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\">");
+		s.append("<head>");
+		s.append("<meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1\" />");
+		s.append("</head>");
+		s.append("<script type=\"text/javascript\">\n"
+				+ "\n"
+				+ "    function resize(image)\n"
+				+ "    {\n"
+				+ " var ratioH = 1.0 * image.clientHeight / document.body.clientHeight; \n"
+				+ "        var ratioW = 1.0 * image.clientWidth / document.body.clientWidth; \n"
+				+ "        if (ratioW < 1) {\n"
+				+ "            image.style['height'] = image.clientHeight + 'px';\n"
+				+ "            image.style['width'] = image.clientWidth + 'px';\n"
+				+ "            return;\n"
+				+ "        }\n"
+				+ "                image.style['width'] = document.body.clientWidth + 'px';\n"
+				+ "        // Optional: remove margins or compensate for offset.\n"
+				+ "        image.style['margin'] = 0;\n"
+				+ "        document.body.style['margin'] = 0;\n"
+
+				+ "    }\n"
+				+ "\n"
+				+ "</script>");
+
 		/*
 		 * s.append(
 		 * "<script src=\"http://use.edgefonts.net/syncopate.js\"></script>");
@@ -360,7 +389,6 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 	/**
 	 * prevent "web page not available" when
-	 * 
 	 * @param webView
 	 * @param html
 	 */
