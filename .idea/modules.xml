@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hkg/hkg.iml" filepath="$PROJECT_DIR$/hkg/hkg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hkgcp/hkgcp.iml" filepath="$PROJECT_DIR$/hkgcp/hkgcp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/warenix.hkg.iml" filepath="$PROJECT_DIR$/warenix.hkg.iml" />
+    </modules>
+  </component>
+</project>
+

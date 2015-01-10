@@ -2,6 +2,41 @@
 <items version="2" >
 
     <item
+        jar="/home/warenix/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
+        <dex dex="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/pre-dexed/debug/library-2.4.0-5d36de45cb671adf98c6a86ccc183be3e965cc49.jar" />
+    </item>
+    <item
+        jar="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/exploded-aar/warenix.hkg/hkgcp/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b2c42a1b53312a9238331137cefbacc30d0b9d45">
+        <dex dex="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/pre-dexed/debug/classes-bc5c9f0daafe4224484cd459953d371764d28e41.jar" />
+    </item>
+    <item
+        jar="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/exploded-aar/com.actionbarsherlock/actionbarsherlock/4.4.0/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="af64527b748983a75de9c0756e9768b56b240a49">
+        <dex dex="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/pre-dexed/debug/classes-b208879a276c4c665d5808888513fa8566208ea0.jar" />
+    </item>
+    <item
+        jar="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/exploded-aar/com.jeremyfeinstein.slidingmenu/library/1.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="0e4072fd48238419f424a112fdeb828d91f69e1a">
+        <dex dex="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/pre-dexed/debug/classes-77ddfeaee2efff4afb3ee2d3889c59fef95c0fd8.jar" />
+    </item>
+    <item
+        jar="/home/warenix/code/repo/googlecode/warenix.hkg/hkg/build/libs/hkg.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4d278f74326880c44d441df6718d31f0b83b441e">
+        <dex dex="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/pre-dexed/debug/hkg-7288c23f08d2f433046725f71631271c7c278780.jar" />
+    </item>
+    <item
         jar="/home/warenix/code/repo/googlecode/warenix.hkg/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
         jumboMode="false"
         revision="21.1.2"
