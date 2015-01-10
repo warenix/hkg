@@ -8,12 +8,12 @@ android {
         applicationId "org.dyndns.warenix.hkg"
         minSdkVersion 8
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 23
+        versionName "1.22"
     }
     buildTypes {
         release {
-//            runProguard false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
