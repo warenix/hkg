@@ -66,6 +66,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 
 			// HKGPage page = mThread.mPageMap.get(mThread.mSelectedPage);
 			HKGPage page = mThread.getPage(mThread.mSelectedPage);
+                        page.setAuthor(mThread.mUser);
 			if (page == null) {
 				setWebViewContent(getString(R.string.thread_loading_error));
 			} else {
@@ -85,10 +86,12 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			+ "margin: 0.1em 0;" + "padding: 0.1em 10px;"
 			+ "line-height: 1.45;" + "position: relative;"
 			+ "border-bottom: 2px solid;" + "border-left: 1px solid;"
-			+ "font-family: syncopate, serif;" + "}";
+			+ "font-family: syncopate, serif;"
+                        + "}";
+    final String mCssAuthor = ".Author { background-color: #3B3A39;}";
 	// + "img {max-width:100%;}";
 
-	final String mCss = mCssViewQuote + mCssColorTheme;
+	final String mCss = mCssViewQuote + mCssColorTheme + mCssAuthor;
 
 	private View mLoadNextPage;
 
@@ -232,9 +235,26 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 		if (page.mPageNo > 1) {
 			count++;
 		}
+
+            String author = page.getAuthor();
+            boolean isAuthor;
 		for (HKGReply reply : page.getReplyList()) {
-			s.append("<br/><hr/>#" + count++ + "<br />");
-			s.append(reply.toString());
+                    isAuthor = reply.mUser.equals(author);
+                    if (isAuthor){
+                        s.append("<div class=\"author\">");
+                    }
+			s.append("<hr/>#" + count++ + "<br/>");
+                    {
+                        StringBuffer sb = new StringBuffer();
+                        sb.append("\n" + reply.mUser.equals(author));
+                        sb.append(" on " + reply.mPostDate);
+                        sb.append("\n" + reply.mContent);
+                        s.append(sb.toString());
+                    }
+			s.append("<br/>");
+                    if (isAuthor){
+                        s.append("</div>");
+                    }
 		}
 		return s.toString();
 	}

@@ -85,6 +85,7 @@ public class HKGThread implements Serializable {
 	public static class HKGPage implements Serializable {
 		static final int MAX_REPLIES_PER_PAGE = 25;
 		int mPageNo;
+                private String mAuthor;
 
 		public HKGPage(int pageNo) {
 			mPageNo = pageNo;
@@ -99,7 +100,15 @@ public class HKGThread implements Serializable {
 		public ArrayList<HKGReply> getReplyList() {
 			return mReplyList;
 		}
-	}
+
+             public void setAuthor(String author) {
+                mAuthor = author;
+            }
+
+            public String getAuthor() {
+                return mAuthor;
+            }
+        }
 
 	public static class HKGReply implements Serializable {
 		public String mUser;
