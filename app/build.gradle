@@ -8,8 +8,8 @@ android {
         applicationId "org.dyndns.warenix.hkg"
         minSdkVersion 8
         targetSdkVersion 21
-        versionCode 23
-        versionName "1.22"
+        versionCode 24
+        versionName "1.22 beta-1"
     }
     buildTypes {
         release {
