@@ -114,7 +114,6 @@ public class HKGThread implements Serializable {
 		public String mUser;
 		public String mPostDate;
 		public String mContent;
-            public String mQuote;
 
 		public void setContent(String contentHtml) {
 			contentHtml = replaceWithRealImage(contentHtml);
@@ -124,15 +123,6 @@ public class HKGThread implements Serializable {
 
 			mContent = contentHtml;
 		}
-
-            public void setQuote(String quoteHtml) {
-                quoteHtml = replaceWithRealImage(quoteHtml);
-                quoteHtml = replaceHKGRelativeImage(quoteHtml);
-                quoteHtml = replaceDoubleSlashImage(quoteHtml);
-                quoteHtml = replaceRelativeImage(quoteHtml);
-
-                mQuote = quoteHtml;
-            }
 
 		String replaceWithRealImage(String contentHtml) {
 			ArrayList<String> realImgList = new ArrayList<String>();

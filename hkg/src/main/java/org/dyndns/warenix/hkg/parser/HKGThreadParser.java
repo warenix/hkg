@@ -1,6 +1,5 @@
 package org.dyndns.warenix.hkg.parser;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 
 import org.dyndns.warenix.hkg.HKGThread;
@@ -16,9 +15,7 @@ import org.dyndns.warenix.hkg.parser.HKGThreadParser.Step;
  */
 public class HKGThreadParser extends HKGParser {
 
-    private boolean mQuoteFound = false;
-
-    enum Step {
+	enum Step {
 		FIND_THERAD_TITLE, //
 		FIND_THREAD_PAGE_COUNT, //
 		FIND_THREAD_REPLY, FIND_THREAD_REPLY_USER, FIND_THREAD_REPLY_POST_DATE, FIND_THREAD_REPLY_CONTENT,
@@ -147,55 +144,11 @@ public class HKGThreadParser extends HKGParser {
 			case FIND_THREAD_REPLY_CONTENT:
 				if (inputLine.startsWith("<div class=\"FloatsClearing\"")) {
 					// reply.mContent = content.toString();
-
-                                    int l = contentList.size();
-                                    if (l == 1){
-                                        String s = contentList.get(0);
-                                        if (mQuoteFound){
-                                            String sepeartor = "</div><br />";
-                                            int lastIndex = s.lastIndexOf(sepeartor);
-                                            reply.setQuote(s.substring(0, lastIndex));
-                                            reply.setContent(s.substring(lastIndex+sepeartor.length()));
-                                        } else {
-                                            reply.setContent(s);
-                                        }
-
-                                    } else if (l > 1){
-                                        content.setLength(0);
-                                        for (int i =0; i <l-1; ++i){
-                                            content.append(contentList.get(i));
-                                        }
-                                        reply.setQuote(content.toString());
-                                        reply.setContent(contentList.get(l-1));
-                                    }
-
-//					reply.setContent(content.toString());
+					reply.setContent(content.toString());
 					mPage.addReply(reply);
-
-//                                    System.out.print("content:" + reply.mContent);
-//                                    System.out.print("<hr/>\n");
-//                                    System.out.print("quote:" + reply.mQuote);
-//                                    System.out.print("<hr/>\n");
-
 					content.setLength(0);
-                                    contentList.clear();
-                                    mQuoteFound = false;
 					mCurrentStep = Step.FIND_THREAD_REPLY;
-
-
-				} else if (inputLine.startsWith("<div><div class=\"ViewQuote")) {
-                                    mQuoteFound = true;
-
-                                    content.append(inputLine);
-                                    contentList.add(content.toString());
-                                    content.setLength(0);
-                                }
-                                else if (inputLine.endsWith("</div>")){
-                                    content.append(inputLine);
-                                    contentList.add(content.toString());
-                                    content.setLength(0);
-                                }
-                                else {
+				} else {
 					content.append(inputLine);
 					if (isAuthorPost) {
 						isAuthorPost = false;
@@ -206,8 +159,6 @@ public class HKGThreadParser extends HKGParser {
 		}
 		return true;
 	}
-
-    private ArrayList<String> contentList = new ArrayList<>();
 
 	public String toString() {
 		StringBuffer s = new StringBuffer(
