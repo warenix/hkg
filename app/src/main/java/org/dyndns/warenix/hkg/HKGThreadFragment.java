@@ -246,7 +246,7 @@ public class HKGThreadFragment extends SherlockFragment implements HKGListener {
 			s.append("<hr/>#" + count++ + "<br/>");
                     {
                         StringBuffer sb = new StringBuffer();
-                        sb.append("\n" + reply.mUser.equals(author));
+                        sb.append("\n" + reply.mUser);
                         sb.append(" on " + reply.mPostDate);
                         sb.append("\n" + reply.mContent);
                         s.append(sb.toString());
