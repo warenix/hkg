@@ -17,7 +17,7 @@ public abstract class HKGParser {
 		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
 		conn.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0");
+				"Mozilla/5.0 (Android; Mobile; rv:30.0) Gecko/30.0 Firefox/30.0");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
 		String inputLine;
