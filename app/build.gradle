@@ -8,12 +8,19 @@ android {
         applicationId "org.dyndns.warenix.hkg"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 25
-        versionName "1.23"
+        versionCode 26
+        versionName "1.26"
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
         release {
-            minifyEnabled true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
