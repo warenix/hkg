@@ -31,6 +31,8 @@ dependencies {
     compile 'com.android.support:support-v4:22.0.+'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.jeremyfeinstein.slidingmenu:library:1.3@aar'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.squareup.okio:okio:1.6.0'
     compile project(":hkg")
     compile project(":hkgcp")
 }
