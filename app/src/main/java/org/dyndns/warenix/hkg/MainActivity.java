@@ -22,15 +22,13 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 
 public class MainActivity extends SlidingActionBarActivity implements
 		HKGListener, HKGThreadListener, HKGForumListener, HKGBookmarkListener,
@@ -412,7 +410,7 @@ public class MainActivity extends SlidingActionBarActivity implements
 				MenuItem.SHOW_AS_ACTION_IF_ROOM
 						| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
-		searchView.setOnQueryTextListener(new OnQueryTextListener() {
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {

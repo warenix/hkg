@@ -6,10 +6,10 @@ import org.dyndns.warenix.hkg.R;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 
-import com.actionbarsherlock.view.Menu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;

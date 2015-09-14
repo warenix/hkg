@@ -1,12 +1,13 @@
 package org.dyndns.warenix.abs;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.SpinnerAdapter;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class BaseActionBarActivity extends SherlockFragmentActivity implements
+
+public class BaseActionBarActivity extends AppCompatActivity implements
                                                                     ActionBar.OnNavigationListener {
 
     private int mLastSelectedItemPosition = -1;
@@ -19,8 +20,7 @@ public class BaseActionBarActivity extends SherlockFragmentActivity implements
     public void setActionBarList(SpinnerAdapter adapter, int selectedIndex) {
         if (adapter == null) {
             mLastSelectedItemPosition = -1;
-            getSupportActionBar().setNavigationMode(
-                ActionBar.DISPLAY_SHOW_TITLE);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
             getSupportActionBar().setListNavigationCallbacks(adapter, this);
         } else {
             getSupportActionBar().setNavigationMode(

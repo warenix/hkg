@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,6 +16,9 @@ import android.support.v4.widget.CursorAdapter;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -21,13 +26,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import static android.view.MenuItem.*;
 
-public class HKGTopicFragment2 extends SherlockListFragment implements
+
+public class HKGTopicFragment2 extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String TAG = "HKGTopicFragment2";
 	private static final int TOPIC_LIST_LOADER = 0x01;
@@ -120,8 +122,8 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		refresh = menu.add(getString(R.string.menu_refresh));
-		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		refresh.setShowAsAction(SHOW_AS_ACTION_IF_ROOM
+				| SHOW_AS_ACTION_WITH_TEXT);
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			@Override
@@ -131,8 +133,8 @@ public class HKGTopicFragment2 extends SherlockListFragment implements
 		});
 
 		more = menu.add(getString(R.string.menu_more));
-		more.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-				| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		more.setShowAsAction(SHOW_AS_ACTION_IF_ROOM
+				| SHOW_AS_ACTION_WITH_TEXT);
 		more.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			@Override
